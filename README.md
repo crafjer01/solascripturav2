@@ -1,8 +1,18 @@
-# React + Vite
+# SolaScriptura
+La Biblia contiene el mensaje de Dios para la humanidad. Pese a que es el libro más vendido en el mundo, no debemos tomar su lectura a la ligera. Es importante leerla, estudiarla, practicarla y compartirla; de modo que tengamos una mejor relación con los demás, y un vínculo estrecho con Dios.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Prerequisitos
+- Node.js (v14+)
+- npm or yarn instaldo globalmente
 
-Currently, two official plugins are available:
+### Instalación
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Clonear este repositorio repository:
+   ```bash
+    git clone git@github.com:crafjerx2/apply-digital-automation.git
+
+    cd solaScriptura
+    
+    npm install
+
+    npm dev

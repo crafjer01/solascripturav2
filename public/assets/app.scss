@@ -1,0 +1,244 @@
+@import '~bootstrap/scss/bootstrap';
+
+body{
+ background: #f2f2f2;
+}
+a{
+    cursor: pointer;
+}
+nav.bg-info {
+    background-color: #0d8396 !important;
+}
+.navbar-brand{
+        font-size: 27px;
+    font-weight: 700;
+}
+.form-group label, label,  .segundosLabel {
+    font-size: 16px;
+    color: #555;
+}
+.nav-link{
+    font-size: 18px;
+}
+.btn-warning, 
+.btn-warning:hover, 
+.btn-warning:focus,
+.btn-warning:active
+{
+    color: #fff;
+    background-color: #ff124e;
+    border-color: #ff124e;
+    box-shadow: 0 0 0 0.2rem rgba(255,18,78,.5);
+}
+.btn-warning:not(:disabled):not(.disabled).active, .btn-warning:not(:disabled):not(.disabled):active, .show>.btn-warning.dropdown-toggle {
+    color: #fff;
+    background-color: #ff124e;
+    border-color: #ff124e;
+   box-shadow: 0 0 0 0.2rem rgba(255,18,78,.5);
+}
+.badge-warning{
+    color: #fff;
+    background-color: #ff124e;
+    border-color: #ff124e; 
+    cursor: pointer;
+}
+.custom-control {
+    position: relative;
+    display: block;
+    min-height: 1.5rem;
+    padding-left: 1.5rem;
+}
+.btn-reglas.btn:hover, .btn-reglas.btn:focus, .btn-reglas.btn-large:hover, .btn-reglas.btn-small:hover {
+    background-color: transparent;
+}
+.custom-control-input {
+    position: absolute;
+    left: 0;
+    z-index: -1;
+    width: 1rem;
+    height: 1.25rem;
+    opacity: 0;
+}
+.custom-control-label {
+    position: relative;
+    margin-bottom: 0;
+    vertical-align: top;
+    font-size: 16px;
+    cursor: pointer;
+}
+input[type='radio'].custom-control-input:checked ~
+.custom-control-label::before {
+    background-color: #fff;
+    border: #adb5bd solid 1px;
+}
+input[type='checkbox'].custom-control-input:checked ~
+.custom-control-label::before {
+    color: #fff;
+    border-color: #007bff;
+    background-color: #007bff; 
+    /*
+    background-color: #fff;
+    border: #adb5bd solid 1px;*/
+}
+  
+
+.border-right {
+    border-right-width: 4px !important;
+}
+hr {
+    border-top: 4px solid rgba(0,0,0,.1);
+}
+.participante-nombre .nombre,
+.participante-ronda .ronda {
+    font-size: 22px;
+}
+.comodin{
+    width: 70px;
+    height: 70px;
+    line-height: 70px;
+    text-align: center;
+    position: fixed;
+    right: 23px;
+    bottom: 23px;
+    padding-top: 15px;
+    margin-bottom: 0;
+    z-index: 997;
+}
+.comodin ul {
+    left: 0;
+    right: 0;
+    text-align: center;
+    position: absolute;
+    bottom: 64px;
+    margin: 0;
+    visibility: hidden;
+}
+.comodin ul li {
+    margin-bottom: 15px;
+}
+.comodin ul a.btn-floating {
+    opacity: 0;
+}
+.fixed-action-btn{
+    position: absolute !important;
+    right: 43px;
+}
+.fixed-action-btn .btn-floating {
+     background: #17a2b8;
+
+}
+.ajustar-comodin {
+    right: 121px !important; 
+    bottom: 48px !important; 
+}
+.reloj .contenido {
+    float: right;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    background: #17a2b8;
+    border-radius: 50%;
+    text-align: center;
+    color: white;
+    font-size: 41px;
+    font-weight: 700;
+}
+#configuracion, #reglas, #login, #info, #registroUsuarioModal, #registroPreguntasModal {
+    background: radial-gradient(#888, transparent);
+    min-height: 100vh;
+}
+@media (min-width: 1076px){
+#reglas .modal-dialog,  
+#info .modal-dialog,
+#registroPreguntasModal .modal-dialog,
+#configuracion .modal-dialog {
+    max-width: 916px;
+    margin: 1.75rem auto;
+    
+    }
+}
+
+.isDisabled {
+  color: currentColor;
+  cursor: not-allowed;
+  opacity: 0.5;
+  text-decoration: none;
+}
+.botones-iniciar button{
+    font-size: 19px;
+    height: 43px
+}
+.msg-error {
+    color: #ff124e;
+    height: 30px;
+    line-height: 30px;
+    padding-left: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-style: italic;
+    font-weight: 900;
+}
+.acordeon input {
+    display: none;
+}
+.acordeon-titulo {
+    display: block;
+    color: #fff;
+    padding: 15px;
+    background: #17a2b8;
+    font-size: 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #fff;
+}
+.acordeon-titulo:hover {
+    background: #19b4cc;
+}
+.acordeon-contenido {
+    height: 0;
+    overflow: hidden;
+    margin: 0;
+    transition: all 0.5s;
+}
+.acordeon input:checked ~ .acordeon-contenido {
+    height: auto;
+    margin: 15px 0;
+}
+.nav-title {
+    display: block;
+    font-size: 41px;
+    margin-bottom: 2rem;
+    color: #fff;
+    text-align: center;
+}
+.nav-title:hover {
+    color: #fff;
+    text-decoration: none;
+}
+.nav-title-line{
+    border-bottom: 2px solid #fff;
+    width: 75%;
+    margin: 0 auto;
+}
+.sidebar-menu{
+    min-height: 100vh;
+}
+.sidebar-menu .nav-link{
+    color: #fff;
+    margin-top: 15px;
+    display: block;
+    background: #19b4cc;
+    border-radius: 5px;
+    font-weight: 700;
+}
+/*===============================================================================================================
+Admin
+*/
+.registrarMas {
+    cursor: pointer;
+    font-weight: 800;
+    color: #fff;
+}
+.registrarMas:hover{
+    color: #fff;
+    text-decoration: none;
+}

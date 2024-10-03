@@ -1,0 +1,1426 @@
+<template>
+    <!--    main -->
+    <main>
+           <!-- Preloading -->
+           <div v-if="isVisiblePreloading">
+            <video autoplay muted loop class="preloading">
+                    <source src="../assets/preloading.mp4" type="video/mp4">
+                    Your browser does not support HTML5 video.
+                </video>
+            </div>
+            <!-- menu -->
+           <nav class="navbar navbar-expand-lg navbar-dark bg-info">
+               <div class="container">
+                  <a class="navbar-brand" href="#">
+                      <img src="../assets/logo.png" alt="logo de solascriptura" style="width: 91px;">
+                  </a>
+                  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+
+                  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <div class="navbar-nav ml-auto">
+                        <a :class="['nav-link', {isDisabled: btnInicio}]"  @click="openModal" >Iniciar</a>
+                        <a :class="['nav-link', {isDisabled: btnInicio}]" @click="openModalReglas">Reglas</a>
+                        <a :class="['nav-link', {isDisabled: btnInicio}]" @click="openModalInfo">Info</a>
+                    </div>
+                  </div>
+                  </div>
+            </nav>
+            <!-- end menu -->
+            
+            <div class="row h-100 justiify-content-center align-items-center" v-if="!juego.inicializado">
+                <div class="col-md-6 text-center">
+                    <h2 class="display-4 w-75 mx-auto  text-left">¿Qué sabes de la Biblia?</h2>
+                    <p class="text-muted w-75 mx-auto text-justify">La Biblia contiene el mensaje de Dios para la humanidad. Pese a que es el libro más vendido en el mundo, no debemos tomar su lectura a la ligera. Es importante leerla, estudiarla, practicarla y compartirla; de modo que tengamos una mejor relación con los demás, y un vínculo estrecho con Dios.</p>
+                    <h2 class="display-4 w-75 mx-auto  text-left">SolaScriptura</h2>
+                    <p class="text-muted w-75 mx-auto text-justify">Llega para que puedas divertirte junto a otros mientras aprenden de la palabra de Dios.</p>
+                    <div class="botones-iniciar w-75 mx-auto text-left mt-5">
+                         <button class="btn btn-info mr-3 text-capitalize px-5"  @click="openModal">Iniciar</button>
+                         <button class="btn btn-default text-capitalize px-5 btn-reglas" @click="openModalReglas">Reglas</button>
+                    </div>
+                   
+                </div>
+                <div class="col-md-6">
+                    <img class="img-fluid" src="../assets/logo.png" alt="">
+                </div>
+            </div>
+        
+            <!--juego -->
+           <div id="juego" v-show="juego.inicializado">
+           
+            <!-- partida-->
+               <div class="partida" v-for="(ronda, rondaIndex) in juego.rondas" 
+                v-if="ronda.show || ! ronda.procesada">
+                 
+                 <!-- Participante -->
+                  <div class="participante mt-5" v-for="(participante, participanteIndex) in ronda.participantes" v-if="participante.jugando">
+                    <div class="container bg-white p-5 rounded">
+                       <div class="row">
+                           <div class="col-md-3 border-right border-info shadow-ms rounded">
+                            <div class="participante-nombre">
+                                <h3 class="font-weight-lighter">
+                                   <span class="font-weight-bold">Participante:</span> <br>
+                                    <span class="nombre">{{ participante.nombre }}</span>
+                                </h3>
+                            </div>
+                            <div class="participante-ronda">
+                                <h3 class="font-weight-lighter">
+                                  <span class="font-weight-bold">Ronda #:</span> <br>
+                                    <span class="ronda">{{ rondaIndex + 1 }} de {{ juego.rondas.length }} </span>
+                                </h3>
+                            </div>
+                            <div class="participante-ronda">
+                                <h3 class="font-weight-lighter">
+                                  <span class="font-weight-bold">Rondas Cancelada:</span> <br>
+                                    <span class="ronda">{{ juego.rondasCancelada }} </span>
+                                </h3>
+                            </div>
+                           </div>
+<!--                       end col-md-3 -->
+                          <div class="col-md-9">
+<!--                           preguntas -->
+                            <div class="preguntas" v-for="(pregunta, preguntaIndex) in participante.preguntas"
+                       v-if="pregunta.show">
+                                <div class="pregunta-decripcion">
+                                    <h3 class="font-weight-lighter">
+                                        {{ pregunta.descripcion }} 
+                                    </h3>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <!--respuestas -->
+                                        <div class="respuestas mt-5">
+                                           <div class="custom-control custom-radio mb-3"  v-for="(respuesta, respuestaIndex)  in pregunta.respuestas" v-if="respuesta.show">
+                                              <input 
+                                              type="radio" 
+                                              v-bind="{id: 'res' + respuestaIndex}" 
+                                              name="respuesta" 
+                                              class="custom-control-input" @click="verificarRespuesta(participante, pregunta, respuesta)" 
+                                               :disabled="pregunta.procesada 
+                                              || pregunta.cantidadSegundosResponder == 0" >
+                                              
+                                              <label class="custom-control-label" 
+                                              v-bind="{for: 'res' + respuestaIndex}">
+                                              {{ respuesta.descripcion }}</label>
+                                            </div>
+                                        </div>
+                                        <!-- end respuestas -->
+                                    </div>
+                                    <div class="col-md-4">
+                                       <div class="reloj" v-show="pregunta.show">
+                                           <div class="contenido" >
+                                               {{ pregunta.cantidadSegundosResponder }}
+                                           </div>
+                                       </div>
+                                       <div class="fixed-action-btn" 
+                                         :style="(participante.ajustarComodin) ? 'right: 121px !important; bottom: 48px !important;' : ''">
+                                          <a class="btn-floating">
+                                            <i class="large material-icons Comodines" data-position="bottom" data-tooltip="Comodines" @click="desplegarComodin">stars</i>
+                                          </a>
+                                          <ul>
+                                            <li>
+                                                <a class="btn-floating green" @click="comodinLlamar(participante, pregunta)" :disabled="participante.comodin.telefono.procesada">
+                                                    <i class="material-icons telefono" data-position="top" 
+                                                    data-tooltip="Llamar a alguien">perm_phone_msg</i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                               <a class="btn-floating blue darken-1" @click="comodinC5050(participante, pregunta, pregunta.respuestas)" :disabled="participante.comodin.c5050.procesada" >
+                                                    <i class="material-icons c50-50" data-position="top" data-tooltip="Mostrar dos respuestas">explore_off</i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="btn-floating red" @click="comodinCita(participante, pregunta)" :disabled="participante.comodin.cita.procesada">
+                                                    <i class="material-icons cita" data-position="top" data-tooltip="Mostrar cita">import_contacts</i>
+                                                </a>
+                                            </li>
+                                          </ul>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+
+                            <!-- control de botones -->
+                            <hr>
+                            
+                            <div class="resultado-respuesta">
+                               <div class="row">
+                                   <div class="col-md-9">
+                                      <div v-show="pregunta.procesada">
+                                        <div v-if="pregunta.showRespuestaCorrecta">
+                                            <p>
+                                                <strong>Genial la repuesta correcta es : 
+                                                {{ pregunta.respuestaCorrecta }} </strong>
+                                                <img src="../assets/FELIZ-SIN-FONDO.gif" alt="Feliz" style="margin-top: -30px; width: 150px; float: right">
+                                            </p>
+                                        </div>
+                                        <div v-else>
+                                            <p>
+                                                <p><strong>Lo siento la repuesta correcta es : 
+                                                 {{ pregunta.respuestaCorrecta }}</strong>
+                                                <img src="../assets/TRISTE_SIN-FONDO.gif" alt="Triste" style="margin-top: -30px; width: 150px; float: right">
+                                            </p>
+                                        </div> 
+                                        <p><strong>Cita Biblica:</strong><em>{{ pregunta.cita }}</em></p>  
+                                      </div>
+                                      <p v-if="participante.comodin.cita.show">
+                                          <strong>Cita Biblica:</strong>
+                                          <em>{{ pregunta.cita }}</em>
+                                       </p>
+                                        <p v-if="participante.comodin.telefono.show">
+                                          <em>Tienes la oportunidad de preguntarle a alguien dentro de la sala o fuuera de la sala.</em>
+                                       </p> 
+                                   </div>
+                                   <div class="col-md-3">
+                                   </div>
+                               </div>
+                            </div>
+                            <!--  resultado-respuesta -->
+                            
+                            <div class="control-boton mt-5">
+                                <button class="btn btn-info mr-3" @click="siguientePregunta(
+                                juego.rondas, ronda, rondaIndex, ronda.participantes, participante, 
+                                participanteIndex, pregunta,  preguntaIndex)">Siguiente</button>
+                                <button class="btn btn-info mr-3" @click="CancelarPregunta(juego.rondas, ronda, rondaIndex, ronda.participantes, participante, participanteIndex, pregunta, preguntaIndex)">Cancelar Pregunta</button>
+                                <button class="btn btn-info mr-3" @click="retirarParticipante(juego.rondas, ronda, rondaIndex, ronda.participantes, participante, participanteIndex)">Retirar Participante</button>
+                                <button class="btn btn-info mr-3" @click="cancelarRonda(juego.rondas, ronda, rondaIndex)">Cancelar Ronda</button>
+                            </div>
+                           <!-- end control de botones -->
+                            </div>
+                            <!--  end preguntas -->
+                          </div>
+                          <!--  end col-md-9 -->
+                       </div>
+                       <!--end row  -->
+                    </div>
+                    <!--  end container -->
+                  </div>
+<!--               end participante  -->
+               </div>
+            <!-- end partida -->
+                <div class="juego-resultados container text-center mb-5" style="margin-top: 5rem" v-if="juego.juegoResultados.show">
+                    <div class="">
+                        <div class="participante-nombre mb-5">
+                            <h2 class="font-weight-lighter display-4">El juego ha terminado </h2>
+                        </div>
+                    </div>
+                    <div class="ganador mb-4">
+                        <h2 class="text-left">
+                            <strong v-if="juego.juegoResultados.ganador != ''">El ganador es :</strong>
+                            <strong v-if="juego.juegoResultados.ganador == ''">No existe ganador</strong>
+                             <span style="font-size: 23px">
+                            {{ juego.juegoResultados.ganador }}
+                            
+                            </span>
+                            <a class="btn btn-info text-white float-right"
+                        @click="nuevoJuego">Nueva partida</a>
+                        </h2>
+                    </div>
+                    <div class="acordeon">
+                        <div class="acordeon-item" v-for="(resultadoPart, resultIndex) in juego.juegoResultados.participantes">
+                            <input type="checkbox" name="acordeon" 
+                            v-bind="{id: 'acordeon-item-' + resultIndex}"
+                            >
+                            <label
+                            v-bind="{for: 'acordeon-item-' + resultIndex}" 
+                            class="acordeon-titulo"><h3>{{ resultadoPart.nombre }}</h3></label>
+                            <p class="acordeon-contenido">
+                                <table class="table">
+                                  <thead>
+                                    <tr>
+                                     <th scope="col">#</th>
+                                      <th scope="col">Nombre</th>
+                                      <th scope="col">Preguntas Correctas</th>
+                                      <th scope="col">Porcentaje Acertado</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      <th scope="row">{{ resultIndex + 1 }}</th>
+                                      <td class="text-center">{{ resultadoPart.nombre }}</td>
+                                      <td class="text-center">{{ resultadoPart.cantidadRespuestaCorrecta }}</td>
+                                      <td class="text-center">{{ resultadoPart.porcentajeAcierto }}%</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                            </p>
+                        </div>
+                    </div>
+               </div>
+           </div>
+            <!-- end juego-->
+        
+        <!-- Modal Iniciar-->
+        <div class="modal fade" id="configuracion" tabindex="-1" role="dialog" aria-labelledby="configuracionLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+              <div class="modal-header bg-info text-white">
+                <h5 class="modal-title text-center" id="configuracionLabel">Inicialización de Juego</h5>
+                <button type="button" class="close"  aria-label="Close" @click="closeModal">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                  <div class="row">
+                      <div class="col-6">
+                           <div class="form-group">
+                                <input type="number" class="form-control" id="rondas" aria-describedby="rondas" placeholder="Cantidad de Rondas" v-model="juego.cantidadRondas">
+                                <div v-if="juego.cantidadRondas !== null">
+                                    <div class="msg-error" v-if="esValorRondasMinima">
+                                    <p>El valor mínimo para las rondas es 1</p>
+                                    </div>
+                                    <div class="msg-error" v-if="esValorRondasMaxima">
+                                        <p>El valor máximo para las rondas es 3</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group d-flex">
+                                <input type="text" class="form-control mr-1" id="nombres" aria-describedby="nombres" placeholder="Participantes" v-model="juego.nombre"> <button type="button" class="btn btn-info" @click="addNombre" :disabled="juego.nombre === ''" style="margin-top: 10px;">Agregar</button>
+                            </div>
+                             <div v-if="juego.nombres.length != 0">
+                                <div class="msg-error" v-if="esParticipanteMinimo">
+                                    <p>La cantidad mínima de participantes son 2.</p>
+                                </div>
+                                 <div class="msg-error" v-if="esParticipanteMaximo">
+                                    <p>La cantidad máximo de participantes son 4.</p>
+                                </div>
+                                
+                            </div>
+                            <ul class="list-group mb-3">
+                                <li class="list-group-item d-flex justify-content-between align-items-center"
+                                v-if="juego.nombres.length > 0" v-for="(nombre, index) in juego.nombres">
+                                    {{ nombre }}
+                                    <span class="badge badge-warning badge-pill close" style="font-size: 0.9rem;" @click="removeNombre(index)">X</span>
+                                </li>
+                            </ul>
+                      </div>
+                      <div class="col-6">
+                            <div class="form-group">
+                                <input type="number" class="form-control" id="cantidadPreguntas" aria-describedby="cantidadPreguntas" placeholder="Cantidad  de Preguntas" 
+                                v-model="juego.cantidadPreguntas" v-on:keyup.13="addNombre">
+                                <div v-if="juego.cantidadPreguntas !== null">
+                                    <div class="msg-error" v-if="esValorPreguntaMinima">
+                                        <p>El valor mínimo para las preguntas es 5</p>
+                                    </div>
+                                    <div class="msg-error" v-if="esValorPreguntaMaxima">
+                                        <p>El valor máximo para las preguntas es 15</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="">
+                                <label for="cantidadSegundos" class=" segundosLabel text-left d-block pl-2">Cantidad Segundos para Responder</label>
+                                <input type="range" class="custom-range" id="cantidadSegundos" min="30" max="160" step="5" v-model="juego.cantidadSegundos">
+                                <div id="showRange" class="show-range" v-if="juego.cantidadSegundos !== 0">{{  juego.cantidadSegundos }}</div>
+                            </div>
+                      </div>
+                  </div>
+                 <div class="acordeon">
+                    <div class="acordeon-item" >
+                        <input type="checkbox" name="acordeon-1" id="acordeon-item-1">
+                        <label for="acordeon-item-1" class="acordeon-titulo"><h6>Antiguo Testamento</h6></label>
+                        <div class="acordeon-contenido" >
+                            <div class="acordeon-item d-inline-block mr-2" v-for="(libro, index) in juego.antiguoTestamentoDB" :key="libro">
+                                
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="antiguo-testamento custom-control-input"
+                                     v-bind="{id: 'antiguoTest-' + index }"
+                                     v-model="juego.antiguoTestamento"
+                                     :value="libro"
+                                     @click="seleccionarTodosLibrosAntiguoTestamento()"
+                                     >
+
+                                    <label class="custom-control-label text-capitalize"
+                                     v-bind="{for: 'antiguoTest-' + index }">
+                                     {{ libro }}
+                                     </label> 
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="acordeon-item" >
+                        <input type="checkbox" name="acordeon-2" id="acordeon-item-2">
+                        <label for="acordeon-item-2" class="acordeon-titulo"><h6>Nuevo Testamento</h6></label>
+                        <div class="acordeon-contenido" >
+                            <div class="acordeon-item d-inline-block mr-2" v-for="(libro, index) in juego.nuevoTestamentoDB" :key="libro">
+                            <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="nuevo-testamento custom-control-input"
+                                     v-bind="{id: 'nuevoTest-' + index }"
+                                     v-model="juego.nuevoTestamento"
+                                     :value="libro"
+                                      @click="seleccionarTodosLibrosNuevoTestamento()"
+                                     >
+
+                                    <label class="custom-control-label text-capitalize"
+                                     v-bind="{for: 'nuevoTest-' + index }">
+                                     {{ libro }}
+                                     </label> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-warning mr-2" @click="closeModal">Cerrar</button>
+                <button type="button" class="btn btn-info"   
+                 @click="iniciarJuego" :disabled="! puedeIniciar">Aceptar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end Modal Iniciar -->
+        <!-- Modal Reglas-->
+        <div class="modal fade" id="reglas" tabindex="-1" role="dialog" aria-labelledby="reglasLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+              <div class="modal-header bg-info text-white">
+                <h5 class="modal-title text-center" id="reglasLabel">Reglas de Juego</h5>
+                <button type="button" class="close"  aria-label="Close" @click="closeModalReglas">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+
+                  <ol class="reglas-list">
+                <li>Al momento de seleccionar una respuesta el juego no permite cambiar de elección.</li>
+                <li>El juego tendrá un moderador quien dirigirá todo el proceso del mismo.</li>
+                <li>La cantidad de rondas a jugar será definida al inicio del juego. El juego permite definir un máximo de 3 rondas.</li>
+                <li>Los comodines <strong>50/50, Cita Bíblica y Ayuda Externa</strong> estarán disponibles por ronda por participantes o grupo.</li>
+                <li>La biblia solo podrá utilizarse al momento de seleccionar el comodín <strong>Cita Bíblica.</strong></li>
+                <li>El comodín <strong>50/50</strong> consiste en dejar solo 2 opciones de las 4 posibles respuestas.</li>
+                <li>El comodín <strong>Ayuda Externa</strong> permite realizar una llamada telefónica a una persona que no esté presente en lugar de la competencia o 
+                    preguntar a alguien que no esté participando en el juego y esté presente en la sala.</li>
+                <li>El comodín <strong>Cita Bíblica</strong> permite realizar una búsqueda en la biblia, contando el tiempo definido para contestar las preguntas.</li>
+                <li>El o los participantes tendrán el tiempo que se haya definido al inicio del juego para responder cada pregunta. El juego permite un máximo de 180 segundos.</li>
+                <li>En caso de estar participando varios equipos, los mismos deben seleccionar un miembro quien fungirá de vocero y estará habilitado para responder las preguntas.</li>
+                <li>	La puntuación de los participantes o equipos será tomada por la cantidad de preguntas contestadas correctamente.</li>
+                <li>La cantidad de preguntas por ronda para cada participante o equipo será definida al inicio del juego. El juego permite definir un máximo de 15 preguntas por participante.</li>
+                <li>Los participantes deben permanecer en silencio al momento que otros estén al turno de contestar las preguntas.</li>
+                <li>El moderador puede cancelar la ronda de un participante o equipo si se comete alguna falta o infracción.</li>
+              </ol>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-info"   
+                 @click="closeModalReglas">Cerrar</button>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+        <!-- end Modal Reglas -->
+
+         <!-- Modal Info-->
+        <div class="modal fade" id="info" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+              <div class="modal-header bg-info text-white">
+                <h5 class="modal-title text-center" id="infoLabel">Información del Juego</h5>
+                <button type="button" class="close"  aria-label="Close" @click="closeModalInfo">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                  <div class="text-center">
+                      <div class="creadores">
+                        <h2>Creadores</h2>
+                        <p>Carlos Pineda</p>
+                        <p>Anuard Michelen</p>
+                      </div>
+                      <div class="creadores">
+                        <h2>Colaboradores</h2>
+                        <p>Wander Marte - Mayker Michelen - Yadir Villegas</p>
+                        <p>Gerson Lamarche - Juan Mitchel</p>
+                      </div>
+                      <div class="info-address">
+                            <h2>Correo electrónico</h2>
+                            <p>solascripturard@gmail.com</p>
+                      </div>
+                      <div class="info-text w-50 mx-auto">
+                            <p>Esperamos que sea de gran ayuda y puedas aprender mientras 
+                                juegas. Cualquier colaboracion o mejora puedes escribirnos</p>
+                      </div>
+
+                  </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-info"   
+                 @click="closeModalInfo">Cerrar</button>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+        <!-- end Modal Reglas -->
+        
+        <login></login>
+    </main>
+<!--    end main -->
+
+</template>
+
+<script>    
+export default {
+    name: 'Home',
+    data(){
+        return {
+            juego: {
+                openComodin: 1,
+                esPreguntasDisponibles: false,
+                nombres: [],
+                nombre: '',
+                inicializado: false,
+                cantidadRondas: null,
+                rondas: [
+                ],
+                rondasCancelada: 0,
+                cantidadRondasContador: 1,
+                cantidadPreguntas: null,
+                repositorioPreguntas: [],
+                antiguoTestamento: [],
+                nuevoTestamento: [],
+                antiguoTestamentoDB: [],
+                nuevoTestamentoDB: [],
+                cantidadSegundos: 30,
+                participantes: [],
+                juegoResultados: {
+                    show: false,
+                    participantes: []
+                },
+                visiblePreloading: true
+                
+            }
+        }
+    },
+    methods: {
+			openModal: function() {
+                if( ! this.juego.inicializado ){
+                  	let modal = document.querySelector('#configuracion');
+				    modal.style.display = 'block';
+				    modal.classList.add('show') ;
+                }
+			},
+			closeModal: function() {
+				let modal = document.querySelector('#configuracion');
+				modal.style.display = 'none';
+				modal.classList.remove('show');
+                this.juego.cantidadPreguntas = null;
+                this.juego.cantidadRondas = null;
+                this.juego.nombres = [];
+                this.juego.antiguoTestamento =  [];
+                this.juego.nuevoTestamento = [];
+			},
+            openModalReglas: function() {
+                if( ! this.juego.inicializado ){
+                    let modal = document.querySelector('#reglas');
+                    modal.style.display = 'block';
+                    modal.classList.add('show') ;
+                }
+            },
+            openModalInfo: function() {
+              if( ! this.juego.inicializado ){
+                let modal = document.querySelector('#info');
+                modal.style.display = 'block';
+                modal.classList.add('show');
+              }
+            },
+            openModalLogin: function() {
+              if( ! this.juego.inicializado ) {
+                let modal = document.querySelector('#login');
+                modal.style.display = 'block';
+                modal.classList.add('show');
+              }
+            },
+			closeModalReglas: function() {
+				let modal = document.querySelector('#reglas');
+				modal.style.display = 'none';
+				modal.classList.remove('show');
+            },
+            closeModalInfo: function() {
+				let modal = document.querySelector('#info');
+				modal.style.display = 'none';
+				modal.classList.remove('show');
+			},
+            closeModalAceptar: function() {
+				let modal = document.querySelector('#configuracion');
+				modal.style.display = 'none';
+				modal.classList.remove('show');
+			},
+            addNombre: function() {
+                if(this.juego.nombres.length > 0)
+                {
+                    if(this.esNombresIgualtes(this.juego.nombre)) 
+                    {
+                        Swal.fire({
+                        icon: 'error',
+                        title: 'No puede haber dos participantes iguales!',
+                        showClass: {
+                            popup: 'animated fadeInDown faster'
+                        },
+                        hideClass: {
+                            popup: 'animated fadeOutUp faster'
+                        }
+                    });
+                    }
+                    else 
+                    {
+                        this.juego.nombres.push(this.juego.nombre);
+                        this.juego.nombre = '';  
+                    }
+                }
+                else
+                {
+                    this.juego.nombres.push(this.juego.nombre);
+                    this.juego.nombre = ''; 
+                }
+
+            },
+            esNombresIgualtes(nombre) {
+                let nombresIguales = false;
+                
+                this.juego.nombres.forEach((nom) => {
+                    let nombreMinuscula = nombre.toLowerCase();
+                    let nomMiniscula = nom.toLowerCase();
+                    
+                    if(nombreMinuscula === nomMiniscula) 
+                    {    
+                        nombresIguales = true;
+                    }
+                });
+
+                return nombresIguales;
+            },
+            removeNombre: function(index) {
+                this.juego.nombres.splice(index, 1);
+            },
+            iniciarJuego: function() {
+                let juego = this.juego;
+
+                //Pila
+                const Pila = this.Pila();
+                let miPila = new Pila();
+
+                //Preguntas
+                let librosSelecionadas = this.getLibrosSeleccionados();
+                console.log('librosSelecionadas: ', librosSelecionadas);
+                let preguntasDisponibles = this.getRepositorioPreguntas(librosSelecionadas);
+                console.log('preguntasDisponibles: ', preguntasDisponibles);
+
+                //add preguntas a la pila
+                preguntasDisponibles.forEach((p) => {
+                   miPila.push(p);
+                });
+
+                let librosSelecionadas2 = this.getLibrosSeleccionados();
+                let preguntasDisponibles2 = this.getRepositorioPreguntas(librosSelecionadas);
+                let preguntasRequeridas = this.getPreguntasRequeridas();
+
+                if ( librosSelecionadas2 == 0 ) 
+                {
+                     Swal.fire({
+                        title: 'No has seleccionado un libro',
+                        text: "las preguntas seleccionadas serán de toda la biblia.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        cancelButtonText: 'No, continuar',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Si, continuar'
+                    }).then((result) => {
+                    if (result.value) { 
+                        this.iniciaJuegoPreguntas(preguntasRequeridas, preguntasDisponibles2, miPila, juego)
+                    }
+                    });
+                
+                } else {
+                    if(preguntasDisponibles2.length == 0) {
+                        Swal.fire({
+                        icon: 'error',
+                        title: 'El libro seleccionado no cuenta con preguntas disponibles. Contacte al administrador.',
+                        showClass: {
+                            popup: 'animated fadeInDown faster'
+                        },
+                        hideClass: {
+                            popup: 'animated fadeOutUp faster'
+                        }});
+                    } else {
+                        this.iniciaJuegoPreguntas(preguntasRequeridas, preguntasDisponibles2, miPila, juego)
+                    }
+                }
+
+            },
+            iniciaJuegoPreguntas(preguntasRequeridas, preguntasDisponibles, pila, juego){
+                if(preguntasRequeridas > preguntasDisponibles.length) {
+                        Swal.fire({
+                            title: 'La cantidad de preguntas requeridas excede las preguntas disponibles',
+                            icon: 'error',
+                            showClass: {
+                                popup: 'animated fadeInDown faster'
+                            },
+                            hideClass: {
+                                popup: 'animated fadeOutUp faster'
+                            }
+                        });
+                    }  else  {
+                        let cantidadRondas = this.juego.cantidadRondas;
+                        for(let i = 0; i < cantidadRondas; i++) {
+                            let participantes = [];
+                                        
+                            this.juego.nombres.forEach( function(nom){
+                            
+                                let participante = {
+                                    nombre: nom,
+                                    puntuacion: 0,
+                                    pIndex: 0,
+                                    jugando: false,
+                                    procesado: false,
+                                    cantidadPreguntas: juego.cantidadPreguntas,
+                                    cantidadPreguntasContador: 0,
+                                    ajustarComodin: false,
+                                    comodin: {
+                                    cita: {
+                                        show: false,
+                                        procesada: false
+                                    },
+                                    c5050: {
+                                        procesada: false
+                                    },
+                                    telefono: {
+                                        show: false,
+                                        procesada: false
+                                    }
+                                    },
+                                    preguntas: []
+                                } //end participantes
+
+                                //set preguntas a participantes
+                                for(let i = 0; i < participante.cantidadPreguntas; i++) {
+                                    let pregunta = pila.pop();
+                                    pregunta.cantidadSegundos = juego.cantidadSegundos;
+                                    pregunta.cantidadSegundosResponder = juego.cantidadSegundos;
+
+                                    participante.preguntas.push(pregunta);
+                                }
+                                //add participante a lista de participantes
+                                participantes.push(participante);
+                            
+                            
+                            });                    
+                            this.juego.rondas.push( {'participantes' : participantes, 
+                            show: false,
+                            procesada: false,
+                            cancelada: false,
+                            cantidadParticipantesContador: 1 });
+                        }
+                    
+                        //setting el juego             
+                        juego.rondas[0].participantes[0].jugando = true;
+                        juego.rondas[0].show = true;
+                        juego.rondas[0].participantes[0].preguntas[0].show = true;                
+                        this.iniciarReloj(juego.rondas[0].participantes[0].preguntas[0]);
+                        this.closeModalAceptar();
+                        juego.inicializado = true;
+                    }
+                   
+            },
+            Pila(){
+                return (function() {
+                    const items  = new WeakMap();
+                    
+                    class Pila {
+                        constructor() {
+                            items.set(this, []);
+                        }
+                                
+                        push(elemento) {
+                            let s = items.get(this);
+                            s.push(elemento);
+                        }
+                        pop() {
+                            let s = items.get(this);
+                            let r = s.pop();
+                            return r;
+                        }
+                        isEmpty() {
+                            let s = items.get(this);
+                            return s.length == 0;
+                        }
+                        size() {
+                            let s = items.get(this);
+                            return s.length;
+                        }
+                        clear() {
+                            items.set(this, []);
+                        };
+                        peek() {
+                            let s = items.get(this);
+                            return s[s.length - 1];
+                        }
+                        print() {
+                            let s = items.get(this);
+                            console.log(s.toString());
+                        };
+                    }
+
+                    return Pila;
+                })();
+            },
+            mostrarResultadosJuego: function(){
+                
+                console.log('*********Entrando: mostrarResultadosJuego ******');
+                
+                let participantesNuevo = [];
+                
+                console.log('********* registrando nombre y puntuacion ******');
+                this.juego.rondas.forEach((ronda, rondaIndex) => {
+                    if(rondaIndex < 1 ) {
+                        console.log(ronda);
+                       ronda.participantes.forEach((part, partIndex) => {
+                            this.juego.juegoResultados.participantes.push({
+                                nombre: part.nombre,
+                                cantidadRespuestaCorrecta: 0,
+                                porcentajeAcierto: 0
+                            });
+                       });
+                    }
+                });
+                console.log('********* actualizando puntuacion ******');
+                this.juego.rondas.forEach((ronda, rondaIndex) => {
+                    ronda.participantes.forEach((part, partIndex) => {
+                        this.juego.juegoResultados.participantes[partIndex].cantidadRespuestaCorrecta += part.puntuacion;
+                   });
+                });
+                
+                console.log('****** El  porcentajeAcierto de los participantes');
+                this.juego.juegoResultados.participantes.forEach( (part) => {
+                    let totalCantidadPreguntasPart = this.juego.cantidadPreguntas *  this.juego.cantidadRondas;
+                    let porcentaje = ( (part.cantidadRespuestaCorrecta  / totalCantidadPreguntasPart ) * 100);
+                    
+                    part.porcentajeAcierto = porcentaje;
+                });
+                
+                console.log('****** selecionar el ganador *****');
+                function getGanador(arrPuntuaciones) {
+                    let nombre = '';
+
+                    for(let i = 0; i < arrPuntuaciones.length; i++ ) {
+                        let part = arrPuntuaciones[i];
+
+                        for(let k = 0; k < arrPuntuaciones.length; k++ ) {
+                            if(part.porcentajeAcierto > arrPuntuaciones[k].porcentajeAcierto) {
+                                nombre = part.nombre;
+                                console.log('El ganador es ' + nombre);
+                                
+                            }
+                        }
+                    }
+
+                    return nombre;
+                }
+                 this.juego.juegoResultados.ganador = getGanador(this.juego.juegoResultados.participantes);
+                
+                this.juego.juegoResultados.show = true;
+            },
+            siguientePregunta(rondas, ronda, rondaIndex, participantes, participante, participanteIndex, pregunta, preguntaIndex) {
+                participante.ajustarComodin = false;
+                if( pregunta.procesada ) 
+                {
+                   this.pasarPreguntaSiguiente(rondas, ronda, rondaIndex, participantes, participante, participanteIndex, pregunta, preguntaIndex);
+                }
+                else 
+                {
+                    
+                    if(pregunta.cantidadSegundosResponder == 0) {
+                        
+                        console.log('********* El tiempo para responder se ha terminado ******');                     
+                        this.pasarPreguntaSiguiente(rondas, ronda, rondaIndex, participantes, participante, participanteIndex, pregunta, preguntaIndex);
+                    } 
+                    else 
+                    {
+                        Swal.fire({
+                            title: 'No has elegido una respuestas',
+                            icon: 'error',
+                            showClass: {
+                                popup: 'animated fadeInDown faster'
+                            },
+                            hideClass: {
+                                popup: 'animated fadeOutUp faster'
+                            }
+                        });
+                    }
+                }
+               
+            },
+            retirarParticipante(rondas, ronda, rondaIndex, participantes, participante, participanteIndex) {
+                Swal.fire({
+                title: 'Estas seguro que quieres retirar al participamte?',
+                text: "No podrás incluir el participante de nuevo a la ronda!",
+                icon: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'No, retirar',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Si, retiralo!'
+                }).then((result) => {
+                if (result.value) {
+                    if( (participanteIndex + 1) === ronda.participantes.length ) 
+                    {
+                        console.log('********* Ultimo participante ******');
+                        this.pasarsiguienteRonda(rondas, ronda, rondaIndex);
+                    } 
+                    else 
+                    {
+                       this.pasarSiguienteParticipante(rondas, ronda, rondaIndex, participantes, participante, participanteIndex);  
+                    }
+                    Swal.fire(
+                    'Retirado!',
+                    'El participante ha sido retirado.',
+                    'success',
+
+                    )
+
+                }
+                }) 
+            },
+            pasarSiguienteParticipante(rondas, ronda, rondaIndex, participantes, participante, participanteIndex) {
+                if( (participanteIndex + 1) === ronda.participantes.length ) 
+                {
+                    console.log('********* Ultimo participante ******');
+                    this.pasarsiguienteRonda(rondas, ronda, rondaIndex);
+                } 
+                else 
+                {
+                    console.log('********* Pasando al siguiente participante ******');
+                    participante.jugando = false;
+                    participante.procesado = true;
+
+                    let participanteNuevo = participantes[participanteIndex + 1];
+                    participanteNuevo.jugando = true;
+                    participanteNuevo.preguntas[0].show = true;
+                    this.iniciarReloj( participantes[participanteIndex + 1].preguntas[0]);   
+                }
+            },
+            cancelarRonda(rondas, ronda, rondaIndex) {
+                Swal.fire({
+                title: 'Estas seguro que quieres cancelar la ronda?',
+                text: "Se iniciará una nueva ronda para continuar jugando",
+                icon: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'No, cancelar',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Si, cancelar!'
+                }).then((result) => {
+                if (result.value) {
+                    if( (rondaIndex + 1) === this.juego.cantidadRondas) 
+                    {
+                        Swal.fire({
+                            title: 'El juego ha terminado',
+                            icon: 'info',
+                            showClass: {
+                                popup: 'animated fadeInDown faster'
+                            },
+                            hideClass: {
+                                popup: 'animated fadeOutUp faster'
+                            }
+                        });
+                        this.mostrarResultadosJuego();
+                    } 
+                    else 
+                    {
+                        console.log('********* Cancelando la  ronda! ******')
+                        ronda.cancelada = true;  
+                        this.pasarsiguienteRonda(rondas, ronda, rondaIndex);
+                        this.juego.rondasCancelada++;
+                        
+                        console.log(rondas);
+                    }
+                    Swal.fire(
+                    'Cancelada!',
+                    'La ronda ha sido cancelada.',
+                    'success'
+                    )
+                }
+                });
+            },
+            pasarsiguienteRonda(rondas, ronda, rondaIndex) {
+                console.log('(rondaIndex + 1): ' + (rondaIndex + 1));
+                console.log('this.juego.cantidadRondas: ' + this.juego.cantidadRondas);
+                if( (rondaIndex + 1) == this.juego.cantidadRondas) 
+                {
+                    Swal.fire({
+                        title: 'El juego ha terminado',
+                        icon: 'info',
+                        showClass: {
+                            popup: 'animated fadeInDown faster'
+                        },
+                        hideClass: {
+                            popup: 'animated fadeOutUp faster'
+                        }
+                    });
+                    ronda.show = false;
+                    ronda.procesada = true;
+                    this.mostrarResultadosJuego();
+                } 
+                else
+                {
+                    console.log('********* pasando a la siguiente ronda! ******');
+                    ronda.show = false;
+                    ronda.procesada = true;
+
+                    let rondaNueva = rondas[rondaIndex + 1];
+                    rondaNueva.show = true;
+                    console.log(rondaNueva);
+                    rondaNueva.participantes[0].jugando = true;
+                    rondaNueva.participantes[0].preguntas[0].show = true;
+                    this.iniciarReloj(rondaNueva.participantes[0].preguntas[0]);
+                }
+
+            },
+            CancelarPregunta(rondas, ronda, rondaIndex, participantes, participante, participanteIndex, pregunta, preguntaIndex) {
+                if( pregunta.procesada ) 
+                {
+                    console.log('********* La pregunta ya ha sido respondida! ******');
+                     Swal.fire({
+                        title: 'La pregunta ya ha sido respondida',
+                        icon: 'error',
+                        showClass: {
+                            popup: 'animated fadeInDown faster'
+                        },
+                        hideClass: {
+                            popup: 'animated fadeOutUp faster'
+                        }
+                    });
+                }
+                else if( pregunta.cantidadSegundosResponder <= 0 )
+                {
+                    console.log('********* La cantidad de segundos ha acabado! ******');
+                    Swal.fire({
+                        title: 'La cantidad de segundos ha acabado',
+                        icon: 'error',
+                        showClass: {
+                            popup: 'animated fadeInDown faster'
+                        },
+                        hideClass: {
+                            popup: 'animated fadeOutUp faster'
+                        }
+                    });
+                }
+                else {
+                    Swal.fire({
+                    title: 'Estas seguro que deseas cancelar la pregunta?',
+                    text: "No podrás incluir la pregunta de nuevo a la ronda!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'No, cancelar',
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Si, cancelar!'
+                    }).then((result) => {
+                    if (result.value) {
+                        this.pasarPreguntaSiguiente(rondas, ronda, rondaIndex, participantes, participante, participanteIndex, pregunta, preguntaIndex);
+                        Swal.fire(
+                        'Cancelada!',
+                        'La pregunta ha sido cancelada.',
+                        'success'
+                        )
+                    }
+                    });
+                }                
+            },
+            pasarPreguntaSiguiente(rondas, ronda, rondaIndex, participantes, participante, participanteIndex, pregunta, preguntaIndex)
+            {
+                if( (preguntaIndex + 1) == participante.cantidadPreguntas) 
+                {
+                     Swal.fire({
+                        title: 'pasando al siguiente participante',
+                        icon: 'info',
+                        showClass: {
+                            popup: 'animated fadeInDown faster'
+                        },
+                        hideClass: {
+                            popup: 'animated fadeOutUp faster'
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                         this.pasarSiguienteParticipante(rondas, ronda, rondaIndex, participantes, participante, participanteIndex); 
+                        }
+                    }); 
+                }
+                else 
+                {
+                    console.log('la pregunta actual es procesada y luego se oculta');
+                    console.log('********* Pregunta procesada ******');
+                    pregunta.procesada = true;
+                    pregunta.show = false;
+
+                    console.log('la sigueinte es presentada');
+                    let preguntaNueva = participante.preguntas[preguntaIndex + 1];
+                    preguntaNueva.show = true;
+                    this.iniciarReloj(preguntaNueva);
+                }  
+            },
+            verificarRespuesta(participante, pregunta, respuesta) {
+                if( respuesta.esCorrecta ) {
+                    console.log('********* la Respuesta es correcta ******');
+                    participante.puntuacion++;
+                    pregunta.showRespuestaCorrecta = true;
+                     console.log('********* participante.puntuacion ******' + participante.puntuacion);
+                }
+                
+                if(participante.comodin.cita.show) {
+                    participante.comodin.cita.show = false;
+                }
+                                
+                pregunta.procesada = true;
+                participante.cantidadPreguntasContador++;
+                this.pararReloj(pregunta);
+            },
+            iniciarReloj(pregunta) {
+                pregunta.cantidadSegundosResponder  = pregunta.cantidadSegundos;
+                
+                pregunta.contadorSegundo = setInterval(function(){
+
+                   pregunta.cantidadSegundosResponder--;
+
+                  if( pregunta.cantidadSegundosResponder <= 0) {
+                      clearInterval(pregunta.contadorSegundo);
+                      Swal.fire({
+                        title: 'Tiempo terminado, favor pasar a la siguiente pregunta.',
+                        icon: 'info',
+                        showClass: {
+                            popup: 'animated fadeInDown faster'
+                        },
+                        hideClass: {
+                            popup: 'animated fadeOutUp faster'
+                        }}
+                        ); 
+                     
+                  }
+                }, 1000);
+            },
+            pararReloj: function(pregunta) {
+                clearInterval(pregunta.contadorSegundo);
+            },
+            desplegarComodin() {
+                let x = this.juego.openComodin;
+                
+                if(x){
+                   var elems = document.querySelectorAll('.fixed-action-btn');
+                    var instances = M.FloatingActionButton.init(elems, {
+                      direction: 'left',
+                        hoverEnabled: false
+                    });
+                    
+                    this.juego.openComodin = 0;
+                } 
+                
+            },
+            comodinCita(participante, pregunta) {
+                if(this.esComodinDisponible(pregunta))
+                {
+                    participante.ajustarComodin = false;
+                    participante.comodin.cita.procesada = true;
+                    participante.comodin.cita.show = true;   
+                }
+                else 
+                {
+                    Swal.fire({
+                        title: 'La pregunta  ha sido procesada, no se puede utilizar el comodin',
+                        icon: 'error',
+                        showClass: {
+                            popup: 'animated fadeInDown faster'
+                        },
+                        hideClass: {
+                            popup: 'animated fadeOutUp faster'
+                        }
+                    });
+                }
+            },
+            comodinLlamar(participante, pregunta) {
+                if(this.esComodinDisponible(pregunta))
+                {
+                    participante.ajustarComodin = false;
+                    participante.comodin.telefono.procesada = true;
+                    participante.comodin.telefono.show = true;
+                }
+                else 
+                {
+                    Swal.fire({
+                        title: 'La pregunta  ha sido procesada, no se puede utilizar el comodin',
+                        icon: 'error',
+                        showClass: {
+                            popup: 'animated fadeInDown faster'
+                        },
+                        hideClass: {
+                            popup: 'animated fadeOutUp faster'
+                        }
+                    });
+                }
+            },
+            comodinC5050(participante, pregunta, respuestas) {
+                if(this.esComodinDisponible(pregunta))
+                {
+                    let contador = 0;
+                    participante.ajustarComodin = true;
+                    for(let i = 0; i < respuestas.length; i++) {
+                        if(! respuestas[i].esCorrecta ) {
+                            respuestas[i].show = false;
+                            participante.comodin.c5050.procesada = true;
+                            contador++;
+
+                            if(contador == 2) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                else 
+                {
+                   Swal.fire({
+                        title: 'La pregunta  ha sido procesada, no se puede utilizar el comodin',
+                        icon: 'error',
+                        showClass: {
+                            popup: 'animated fadeInDown faster'
+                        },
+                        hideClass: {
+                            popup: 'animated fadeOutUp faster'
+                        }
+                    });
+                }
+            },
+            esComodinDisponible(pregunta) {
+                let disponible = true;
+                
+                if( pregunta.procesada || pregunta.cantidadSegundosResponder <= 0) {
+                    disponible = false;
+                }
+                
+                return disponible;
+            },
+            getRepositorioPreguntas(libros) {
+                console.log('entrando... getRepositorioPreguntas');
+                console.log('Buscando preguntas del libro or libros: ', libros);
+                let preguntas = [];
+                let juego = this.juego;
+                let preguntasPorLibro;
+
+                if( libros.length != 0) {
+                    libros.forEach(l => {
+                    preguntasPorLibro = juego.repositorioPreguntas.filter( p => p.libro == l);
+                        preguntas = preguntas.concat(preguntasPorLibro);
+
+                    });
+                } else {
+                    preguntas = juego.repositorioPreguntas;
+                }
+
+                return preguntas;
+            },
+            getPreguntasRequeridas(){
+                let juego = this.juego;
+                return juego.cantidadRondas * 
+                        juego.cantidadPreguntas * 
+                        juego.nombres.length;
+            },
+            getLibrosSeleccionados() {
+                let juego = this.juego;
+                return juego.antiguoTestamento.concat(juego.nuevoTestamento);
+            },
+            nuevoJuego: function() {
+                let juego = this.juego;
+                juego.openComodin =  1;
+                juego.nombres = [];
+                juego.nombre = '';
+                juego.inicializado = false,
+                juego.cantidadRondas = null;
+                juego.rondas =  [];
+                juego.rondasCancelada =  0;
+                juego.cantidadRondasContador =  1;
+                juego.cantidadPreguntas =  null;
+                juego.antiguoTestamento =  [];
+                juego.nuevoTestamento =  [];
+                juego.juegoResultados =  {
+                    show: false,
+                    participantes: []
+                };
+            },
+            seleccionarTodosLibrosAntiguoTestamento() {
+                setTimeout(() => {
+                    let libros = this.getLibrosSeleccionados();
+                    let checks = document.querySelectorAll(".antiguo-testamento");
+                    let todos = '';
+                    
+                    checks.forEach((check) => {
+                        if( check.value == 'Todos' && check.checked ) {
+                            todos = check.value; 
+                        }
+                    }); 
+                    
+                    if(todos !== '') {
+                        checks.forEach((check) => {
+                            check.checked = true;
+                        });
+                    }else {                       
+                        if(libros.length === 0) {
+                            checks.forEach((check) => {
+                                check.checked = false;
+                            });    
+                        }
+                    }
+    
+                },100);
+            },
+            seleccionarTodosLibrosNuevoTestamento() {
+                setTimeout(() => {
+                    let libros = this.getLibrosSeleccionados();
+                    let checks = document.querySelectorAll(".nuevo-testamento");
+                    let todos = '';
+                    
+                    checks.forEach((check) => {
+                        if( check.value == 'Todos' && check.checked ) {
+                            todos = check.value; 
+                        }
+                    }); 
+                    
+                    if(todos !== '') {
+                        checks.forEach((check) => {
+                            check.checked = true;
+                        });
+                    }else {                     
+                        if(libros.length === 0) {
+                            checks.forEach((check) => {
+                                check.checked = false;
+                            });    
+                        }
+                    }
+    
+                },100);
+            }
+		},
+    computed: {
+            esValorRondasMinima: function() {
+                return (this.juego.cantidadRondas < 1) ? true : false;
+            },
+            esValorRondasMaxima: function() {
+                return (this.juego.cantidadRondas > 3) ? true : false;
+            },
+            esValorPreguntaMinima: function() {
+                return (this.juego.cantidadPreguntas < 2) ? true : false;
+            },
+            esValorPreguntaMaxima: function() {
+                return (this.juego.cantidadPreguntas > 15) ? true : false;
+            },
+            puedeIniciar: function() {
+                let iniciar = false;
+                
+                if(
+                    this.juego.nombres.length > 0 &&
+                    this.juego.cantidadPreguntas !== null &&
+                    this.juego.cantidadPreguntas > 1 &&
+                    this.juego.cantidadPreguntas < 16 &&
+                    this.juego.cantidadRondas !== null &&
+                    this.juego.cantidadRondas > 0 &&
+                    this.juego.cantidadRondas < 4 &&
+                    this.juego.nombres.length > 1 &&
+                    this.juego.nombres.length < 5
+                )
+                {
+                    iniciar = true;
+                }
+                    
+
+                   
+                return iniciar;
+                
+            },
+            btnInicio: function() {
+                let inicio = false;
+                let juego = this.juego;
+            
+                if( juego.inicializado ) {
+                    inicio = true;
+                }
+                
+                return inicio;
+            },
+            isVisiblePreloading: function() {               
+                setTimeout(() => {
+                    this.juego.visiblePreloading = false;
+                    console.log(' this.juego.visiblePreloading: ' +  this.juego.visiblePreloading);
+                }, 8000);
+
+               return  this.juego.visiblePreloading;
+            },
+            esParticipanteMinimo: function()
+            {
+                if( this.juego.nombres.length < 2 ) {
+                    return true;
+                } 
+               
+            },
+            esParticipanteMaximo: function()
+            {
+                if( this.juego.nombres.length > 4 ) {
+                    return true;
+                } 
+               
+            }
+ 
+        },
+    created() {
+            let juego = this.juego;
+            let servidor = window.location.href;
+
+            //cargar preguntas en local json
+            let url = servidor + 'data.json';
+            fetch(url)
+            .then( function(res) {
+                console.log('https://solascripturaapi.000webhostapp.com/');
+                console.log(res);
+                return res.json();
+            })
+            .then(function(data) { 
+                console.log(data);
+                juego.repositorioPreguntas = data;
+            });
+
+            //cargar biblia Antiguo testamnto en local json
+            let urlAntiguo = servidor + 'antiguo_testamento.json';
+            fetch(urlAntiguo)
+            .then( function(res) {
+                return res.json();
+            })
+            .then(function(antiguo) { 
+                juego.antiguoTestamentoDB = antiguo;
+            });
+
+             //cargar biblia Nuevo testamnto en local json
+            let urlNuevo = servidor + 'nuevo_testamento.json';
+            fetch(urlNuevo)
+            .then( function(res) {
+                return res.json();
+            })
+            .then(function(nuevo) { 
+                    juego.nuevoTestamentoDB = nuevo;
+            });
+        }
+
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="scss">
+    .preloading {
+        position: fixed;
+         right: 0;
+        bottom: 0;
+        z-index: 99999;
+        background: #000;
+        width: 100%;
+        height: 100%;
+    }
+    
+
+</style>
