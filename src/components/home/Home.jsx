@@ -1,6 +1,13 @@
 import './home.css';
 
-export const Home = () => {
+export const Home = ({ game, setGame }) => {
+
+  const onStart = () => {
+    setGame({
+      ...game,
+      'started': true
+    });
+  }
   return (
     <>
       <main className="main_wrapper">
@@ -19,7 +26,9 @@ export const Home = () => {
                 <p>Llega para que puedas divertirte junto a otros mientras aprenden de la palabra de Dios.</p>
               </div>
               <div className="buttons">
-                <button className="btn-primary">Iniciar</button>
+                <button className="btn-primary"
+                  onClick={ onStart }
+                >Iniciar</button>
               </div>
             </div>
           </div>  
