@@ -1,4 +1,4 @@
-import './home.css';
+import { Grid2, Box, Container, Typography, Button } from '@mui/material';
 
 export const Home = ({ game, setGame }) => {
 
@@ -9,49 +9,35 @@ export const Home = ({ game, setGame }) => {
     });
   }
   return (
-    <>
-      <main className="main_wrapper">
-        <div className="main_container">
-          <div className="main_left">
-            <div className="content">
-              <h1 className="title">¿Qué sabes de la Biblia?</h1>
-              <div className="text">
-                <p>La Biblia contiene el mensaje de Dios para la humanidad.
-                  Pese a que es el libro más vendido en el mundo, no debemos tomar su lectura a la ligera.
-                  Es importante leerla, estudiarla, practicarla y compartirla; de modo que tengamos una mejor relación con los demás,
-                    y un vínculo estrecho con Dios.</p>
-              </div>
-              <h2 className="subtitle">SolaScriptura</h2>
-              <div className="text">
-                <p>Llega para que puedas divertirte junto a otros mientras aprenden de la palabra de Dios.</p>
-              </div>
-              <div className="buttons">
-                <button className="btn-primary"
-                  onClick={ onStart }
-                >Iniciar</button>
-              </div>
-            </div>
-          </div>  
-          <div className="main_right">
-            <div className="img-container">
-              <img src="/assets/logo.png" alt="" />
-            </div>
-          </div>
-        </div>
-      </main>
-      {/* <footer className="footer">
-        <div className="medial-icon">
-          <div className="media-icon-item">
-            <i class="material-icons">person</i>
-          </div>
-          <div className="media-icon-item">
-            <i class="material-icons">person</i>
-          </div>
-          <div className="media-icon-item">
-            <i class="material-icons">person</i>
-          </div>
-        </div>
-      </footer> */}
-    </>
-  );
+    <Container maxWidth="xl">
+      <Grid2 container spacing={2}>
+        <Grid2 size={6}>
+          <Box sx={{ mt: 7 }}>
+            <Typography variant="h3" component="h1" sx={{ color: '#444' }}>¿Qué sabes de la Biblia?</Typography>
+            <Typography variant='body1' component="p" sx={{ mt: 2, color: '#666' }}>
+              Pese a que es el libro más vendido en el mundo, no debemos tomar su lectura a la ligera.
+              Es importante leerla, estudiarla, practicarla y compartirla; de modo que tengamos una mejor relación con los demás,
+              y un vínculo estrecho con Dios.
+            </Typography>
+          </Box>
+          <Box sx={{ mt: 5 }}>
+            <Typography variant="h3" component="h1" sx={{ color: '#444' }}>SolaScriptura</Typography>
+            <Typography variant='body1' component="p" sx={{ color: '#666' }}>
+              Llega para que puedas divertirte junto a otros mientras aprenden de la palabra de Dios.
+            </Typography>
+          </Box>
+          <Box sx={{ mt: 5 }}>
+            <Button variant="contained"
+              onClick={ onStart }
+            >Iniciar</Button>
+          </Box>
+        </Grid2>
+        <Grid2 size={6} >
+          <Box>
+            <img src="/assets/logo.png" alt="SolaScriptura" />
+          </Box>
+        </Grid2>
+      </Grid2>
+      </Container>
+      );
 };
