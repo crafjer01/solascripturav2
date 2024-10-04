@@ -4,37 +4,103 @@ import { PersonAddAlt } from '@mui/icons-material';
 import { oldBooksDB, newBooksDB } from '../../data/';
 
 export const Form = ({ game, setGame }) => {
-  const [secondToAnswer, setSecondToAnswer] = useState(30);
-
-  const onSecondToAnswerChange = ({ target }) => {
-    setSecondToAnswer(target.value);
-  }
-
-  const onCancel = () => {
-    setGame({
-      ...game,
-      'started': false
+    const [form, setForm] = useState({
+      rondasQuantity: 1,
+      questionsQuantity: 5,
+      participant: '',
+      participantList: [],
+      secondAnswer: 30
     });
-  }
+    const { rondasQuantity, questionsQuantity, participant, participantList, secondAnswer } = form;
+
+    const onRondasQuantityChange = ({ target }) => {
+      const { value, name} = target;
+
+      if ( value.length === '' ) return;
+
+      const numberValue = parseInt(value);
+
+      if ( numberValue < 1 ) {
+        setForm({
+          ...form,
+          [name]: 1
+        });
+      }
+      else if ( numberValue > 4 ) {
+        setForm({
+          ...form,
+          [name]: 4
+        });
+      } 
+      else {
+        setForm({
+          ...form,
+          [name]: numberValue
+        });
+      }
+      
+    }
+
+    const onQuestionsQuantityChange = ({ target }) => {
+      const { value, name} = target;
+
+      if ( value.length === '' ) return;
+
+      const numberValue = parseInt(value);
+
+      if ( numberValue < 5 ) {
+        setForm({
+          ...form,
+          [name]: 5
+        });
+      }
+      else if ( numberValue > 15 ) {
+        setForm({
+          ...form,
+          [name]: 15
+        });
+      } 
+      else {
+        setForm({
+          ...form,
+          [name]: numberValue
+        });
+      }
+      
+    }
+
+    const onCancel = () => {
+      setGame({
+        ...game,
+        'started': false
+      });
+    }
 
   return (
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper sx={{ p: 2 }}>
         <Typography variant='h5' component="h2" sx={{ textAlign: 'center', mb: 3 }}>Inicialización del Juego</Typography>
-        <form>
           <Grid2 container spacing={2}>
             {/* Rounds and Questions */}
             <Grid2 size={6} >
-              <TextField id="" name="round" type="number" label="Rondas" variant="standard" fullWidth  autoComplete="off" />
+              <TextField id="" name="rondasQuantity" type="number" label="Rondas" variant="standard" fullWidth  autoComplete="off" 
+                value={ rondasQuantity }
+                onChange={ onRondasQuantityChange }
+              />
             </Grid2>
             <Grid2 size={6} >
-              <TextField id="" name="round" type="number" label="Preguntas" variant="standard" fullWidth   autoComplete="off" />
+              <TextField id="" name="questionsQuantity" type="number" label="Preguntas" variant="standard" fullWidth   autoComplete="off" 
+                value={ questionsQuantity }
+                onChange={ onQuestionsQuantityChange }
+              />
             </Grid2>
             {/* Participants and Second to Answer */}
             <Grid2 size={6} >
               <Grid2 container spacing={1} sx={{ alignItems: 'center' }} >
                 <Grid2 sx={{ flexGrow: 1 }}>
-                  <TextField id="" name="participants"  label="Participantes" variant="standard" fullWidth  autoComplete="off" />
+                  <TextField id="" name="participants"  label="Participantes" variant="standard" fullWidth  autoComplete="off" 
+                    value={ participant }
+                  />
                 </Grid2>
                 <Button variant='text' size='sm' sx={{ minWidth: 0, p: 0,  alignSelf: 'end' }}>
                   <PersonAddAlt color="primary" />
@@ -44,7 +110,7 @@ export const Form = ({ game, setGame }) => {
             <Grid2 size={6} sx={{ alignSelf: 'end' }}>
               <Slider 
                 sx={{ p: 0 }} 
-                defaultValue={0} 
+                value={ secondAnswer } 
                 aria-label="Segundo-a-responder" 
                 valueLabelDisplay="auto" 
                 shiftStep={30}
@@ -91,13 +157,12 @@ export const Form = ({ game, setGame }) => {
             </Grid2>
           </Grid2>
           <Box sx={{ mt: 5 }} >
-            <Button variant="contained" type="submit" sx={{ mr: 2 }}
+            <Button variant="contained" sx={{ mr: 2 }}
             >Iniciar</Button>
-            <Button variant="outlined" type="submit"
+            <Button variant="outlined"
             onClick={ onCancel }
             >Cancelar</Button>
           </Box>
-        </form>
       </Paper>
     </Container>
   )
