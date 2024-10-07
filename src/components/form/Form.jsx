@@ -1,7 +1,12 @@
 import { useState } from 'react';
-import { Box, Button, Container, Grid2, Paper, FormControl, InputLabel, Slider, TextField, Select, Typography, MenuItem} from '@mui/material';
+import { Box, Button, Container, Grid2, Paper, FormGroup, InputLabel, Slider, TextField, Select, Typography, 
+  MenuItem, List, IconButton, ListItem, ListItemText, ListItemAvatar, Avatar,
+  FormControlLabel,
+  Checkbox} from '@mui/material';
 import { PersonAddAlt } from '@mui/icons-material';
 import { oldBooksDB, newBooksDB } from '../../data/';
+import { ParticipantList } from './ParticipantList';
+import { SelectBook } from './SelectBook';
 
 export const Form = ({ game, setGame }) => {
     const [form, setForm] = useState({
@@ -9,9 +14,17 @@ export const Form = ({ game, setGame }) => {
       questionsQuantity: 5,
       participant: '',
       participantList: [],
-      secondAnswer: 30
+      secondAnswer: 30,
+      bookOldSelected: [],
+      bookNewSelected: [],
+      allBible: false,
+      oldBook: false,
+      newBook: false
+
     });
-    const { rondasQuantity, questionsQuantity, participant, participantList, secondAnswer } = form;
+    const { rondasQuantity, questionsQuantity, participant, participantList, secondAnswer, bookOldSelected, bookNewSelected, oldBook, allBible, newBook } = form;
+    const [isDuplicated, setIsDuplicated] = useState(false);
+   // const [disabledSelectOldBook, setDisabledSelectOldBook] = useState(false);
 
     const onRondasQuantityChange = ({ target }) => {
       const { value, name} = target;
@@ -69,12 +82,94 @@ export const Form = ({ game, setGame }) => {
       
     }
 
+    const onParticipantChange = ({ target }) => {
+      const { value, name } = target;
+
+      setForm({
+        ...form,
+        [name]: value
+      });
+    }
+    const addParticipant = () => {
+      if ( participant === '' ) return;
+
+      if( participantList.includes(participant) ) {
+        setIsDuplicated(true);
+      } else {
+        setIsDuplicated(false);
+        setForm({
+          ...form,
+          ['participantList']: [...participantList, participant],
+          ['participant']: ''
+        });
+      }
+    }
+
+    const onSecondAswerChange = ({ target }) => {
+      const {value, name} = target;
+      setForm({
+        ...form,
+        [name]: value
+      });
+    }
+
+    const onBookOldSelecChange = ({ target }) => {
+      const { value } = target;
+      setForm({
+        ...form,        
+        ['bookOldSelected']: typeof value === 'string' ? value.split(',') : value,
+      });
+    }
+
+    const onBookNewSelecChange = ({ target }) => {
+      const { value } = target;
+      setForm({
+        ...form,        
+        ['bookNewSelected']: typeof value === 'string' ? value.split(',') : value,
+      });
+    }
+
+    const onHandleDelete = (name) => {
+      setForm({
+        ...form,
+        ['participantList']: participantList.filter(participant => participant !== name)
+      });
+    }
+
+    const onCheckAllBible = () => {
+      setForm({
+        ...form,
+        bookOldSelected: [],
+        bookNewSelected: [], 
+        allBible: !allBible
+      });
+    }
+
+    const onCheckOldBook = () => {
+      setForm({
+        ...form,
+        bookOldSelected: [],
+        oldBook: !oldBook
+      });
+    }
+
+    const onCheckNewBook = () => {
+      setForm({
+        ...form,
+        bookNewSelected: [], 
+        newBook: !newBook
+      });
+    }
+
     const onCancel = () => {
       setGame({
         ...game,
         'started': false
       });
     }
+
+    const disabledSelectOldBook = (allBible || oldBook);
+    const disabledSelectNewBook = (allBible || newBook);
 
   return (
     <Container maxWidth="md" sx={{ mt: 5 }}>
@@ -98,13 +193,20 @@ export const Form = ({ game, setGame }) => {
             <Grid2 size={6} >
               <Grid2 container spacing={1} sx={{ alignItems: 'center' }} >
                 <Grid2 sx={{ flexGrow: 1 }}>
-                  <TextField id="" name="participants"  label="Participantes" variant="standard" fullWidth  autoComplete="off" 
+                  <TextField id="" name="participant"  label="Participantes" variant="standard" fullWidth  autoComplete="off" 
+                    disabled={participantList?.length === 4 ? true : false}
                     value={ participant }
+                    onChange={ onParticipantChange }
                   />
                 </Grid2>
-                <Button variant='text' size='sm' sx={{ minWidth: 0, p: 0,  alignSelf: 'end' }}>
-                  <PersonAddAlt color="primary" />
-                </Button>
+                <IconButton 
+                  variant='text' size='sm' 
+                  sx={{ minWidth: 0, p: 0,  alignSelf: 'end' }}
+                  disabled={participantList?.length === 4 ? true : false} 
+                  onClick={ addParticipant }
+                >
+                  <PersonAddAlt color={`${participantList?.length === 4 ? '' : 'primary'}`} />
+                </IconButton>
               </Grid2>
             </Grid2>
             <Grid2 size={6} sx={{ alignSelf: 'end' }}>
@@ -117,43 +219,36 @@ export const Form = ({ game, setGame }) => {
                 step={10}
                 marks
                 min={30}
-                max={180}  
+                max={180}
+                name="secondAnswer"
+                onChange={ onSecondAswerChange }  
               />
+            </Grid2>
+            <Grid2 size={6}>
+              { isDuplicated && <Typography component="p" sx={{ color: 'red', fontStyle: 'italic', fontSize: '14px' }}>El participante esta duplicado.</Typography> }
+            </Grid2>
+            {/* participant List */}
+            <Grid2 size={12}>
+              { participantList?.length > 0 && <ParticipantList participants={participantList} onHandleDelete={onHandleDelete} /> } 
             </Grid2>
             {/* Select the books, old or new */}
             <Grid2 size={6}>
-            <FormControl variant="standard" fullWidth>
-              <InputLabel id="select-old-book">Seleccione Antiguo Testamento</InputLabel>
-              <Select
-                labelId="select-old-book"
-                label="old-book"
-                value={10}
-              >
-                { 
-                  oldBooksDB.map( book => (
-                    <MenuItem key={book.name} value={book.id}>{ book.name }</MenuItem>
-                  ))
-                }
-              
-              </Select>
-            </FormControl>
+              <SelectBook books={oldBooksDB} name="Viejo" onBookSelecChange={onBookOldSelecChange} booksSelected={bookOldSelected} selectDisabled={disabledSelectOldBook}  />
             </Grid2>
             <Grid2 size={6}>
-            <FormControl variant="standard" fullWidth>
-              <InputLabel id="select-new-book">Seleccione Nuevo Testamento</InputLabel>
-              <Select
-                labelId="select-new-book"
-                label="new-book"
-                value={10}
-              >
-                { 
-                  newBooksDB.map( book => (
-                    <MenuItem key={book.name} value={book.id}>{ book.name }</MenuItem>
-                  ))
-                }
-              
-              </Select>
-            </FormControl>
+              <SelectBook books={newBooksDB} name="Nuevo" onBookSelecChange={onBookNewSelecChange} booksSelected={bookNewSelected} selectDisabled={disabledSelectNewBook}  />
+            </Grid2>
+            <Grid2 size={12}>
+            <FormGroup row sx={{ justifyContent: 'space-between'}} >
+                <FormControlLabel control={<Checkbox size="small" onClick={ onCheckOldBook } disabled={allBible}  />} label="Todo el viejo testamento"
+                  
+                />
+                <FormControlLabel control={<Checkbox size="small" onClick={ onCheckAllBible } />} label="Toda la biblia" 
+                  
+                />
+                <FormControlLabel control={<Checkbox size="small" onClick={ onCheckNewBook } disabled={allBible} />} label="Todo el nuevo testamento" 
+                />
+              </FormGroup>
             </Grid2>
           </Grid2>
           <Box sx={{ mt: 5 }} >

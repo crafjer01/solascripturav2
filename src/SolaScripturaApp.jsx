@@ -8,7 +8,8 @@ import { AppTheme } from './theme/AppTheme'
 
 export const SolaScripturaApp = () => {
   const [game, setGame] = useState({
-    started: false
+    visiblePreloading: true,
+    started: false,
   });
   const { started } = game;
 
