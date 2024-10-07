@@ -5,11 +5,13 @@ import { Form } from './components/form/Form';
 
 import { AppTheme } from './theme/AppTheme'
 import { Preloading } from './components/preloading/Preloading';
+import { Game } from './components/game/Game';
 
 
 export const SolaScripturaApp = () => {
   const [game, setGame] = useState({
-    started: false,
+    formStarted: false,
+    started: false
   });
   const [ preloading, setPreloading ] = useState(true);
 
@@ -19,17 +21,15 @@ export const SolaScripturaApp = () => {
     }, 9500);
   }, []);
 
-  const { started } = game;
+  const { formStarted, started } = game;
 
   return (
     <AppTheme>
         { preloading && <Preloading /> }
         <Navbar />
-        { 
-          (!started) 
-          ? <Home game={game} setGame={setGame} /> 
-          : <Form game={game} setGame={setGame} />
-        } 
+        {  (!formStarted && !started) && <Home game={game} setGame={setGame} /> } 
+        { (formStarted && !started) && <Form game={game} setGame={setGame} /> }
+        { (started) && <Game game={game} setGame={setGame} /> }
     </AppTheme>
   )
 }

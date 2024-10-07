@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Button, Container, Grid2, Paper, FormGroup, InputLabel, Slider, TextField, Select, Typography, 
   MenuItem, List, IconButton, ListItem, ListItemText, ListItemAvatar, Avatar,
   FormControlLabel,
@@ -10,7 +10,7 @@ import { SelectBook } from './SelectBook';
 
 export const Form = ({ game, setGame }) => {
     const [form, setForm] = useState({
-      rondasQuantity: 1,
+      roundsQuantity: 1,
       questionsQuantity: 5,
       participant: '',
       participantList: [],
@@ -22,11 +22,11 @@ export const Form = ({ game, setGame }) => {
       newBook: false
 
     });
-    const { rondasQuantity, questionsQuantity, participant, participantList, secondAnswer, bookOldSelected, bookNewSelected, oldBook, allBible, newBook } = form;
+    const { roundsQuantity, questionsQuantity, participant, participantList, secondAnswer, bookOldSelected, bookNewSelected, oldBook, allBible, newBook } = form;
     const [isDuplicated, setIsDuplicated] = useState(false);
-   // const [disabledSelectOldBook, setDisabledSelectOldBook] = useState(false);
+    const [ btnStartDisabled, setBtnStartDisabled ] = useState(true);
 
-    const onRondasQuantityChange = ({ target }) => {
+    const onRoundsQuantityChange = ({ target }) => {
       const { value, name} = target;
 
       if ( value.length === '' ) return;
@@ -105,7 +105,7 @@ export const Form = ({ game, setGame }) => {
       }
     }
 
-    const onSecondAswerChange = ({ target }) => {
+    const onSecondAnswerChange = ({ target }) => {
       const {value, name} = target;
       setForm({
         ...form,
@@ -113,7 +113,7 @@ export const Form = ({ game, setGame }) => {
       });
     }
 
-    const onBookOldSelecChange = ({ target }) => {
+    const onBookOldSelectChange = ({ target }) => {
       const { value } = target;
       setForm({
         ...form,        
@@ -121,7 +121,7 @@ export const Form = ({ game, setGame }) => {
       });
     }
 
-    const onBookNewSelecChange = ({ target }) => {
+    const onBookNewSelectChange = ({ target }) => {
       const { value } = target;
       setForm({
         ...form,        
@@ -141,7 +141,9 @@ export const Form = ({ game, setGame }) => {
         ...form,
         bookOldSelected: [],
         bookNewSelected: [], 
-        allBible: !allBible
+        allBible: !allBible,
+        oldBook: false,
+        newBook: false
       });
     }
 
@@ -149,15 +151,21 @@ export const Form = ({ game, setGame }) => {
       setForm({
         ...form,
         bookOldSelected: [],
-        oldBook: !oldBook
+        bookNewSelected: [],
+        oldBook: !oldBook,
+        newBook: false,
+        allBible: false
       });
     }
 
     const onCheckNewBook = () => {
       setForm({
         ...form,
+        bookOldSelected: [],
         bookNewSelected: [], 
-        newBook: !newBook
+        newBook: !newBook,
+        oldBook: false,
+        allBible: false
       });
     }
 
@@ -168,8 +176,30 @@ export const Form = ({ game, setGame }) => {
       });
     }
 
-    const disabledSelectOldBook = (allBible || oldBook);
-    const disabledSelectNewBook = (allBible || newBook);
+    
+    useEffect(() => {
+      const { roundsQuantity, questionsQuantity, participantList, secondAnswer, bookOldSelected, bookNewSelected, allBible, oldBook, newBook } = form;
+      const isValidForm = roundsQuantity > 0 && 
+            roundsQuantity <= 4 && 
+            questionsQuantity > 4 && 
+            questionsQuantity <= 15 && 
+            participantList.length > 1 && 
+            secondAnswer > 0 && 
+            secondAnswer < 180 &&
+            (allBible || oldBook || newBook || bookOldSelected.length > 0 || bookNewSelected.length > 0);
+      setBtnStartDisabled(!isValidForm);
+    }, [ form ]);
+
+    const onStartGame = () => {
+      setGame({
+        ...game,
+        formStarted: false,
+        started: true
+      });
+    }
+
+    const disabledSelectOldBook = (allBible || oldBook || newBook);
+    const disabledSelectNewBook = (allBible || newBook || oldBook);
 
   return (
     <Container maxWidth="md" sx={{ mt: 5 }}>
@@ -178,9 +208,9 @@ export const Form = ({ game, setGame }) => {
           <Grid2 container spacing={2}>
             {/* Rounds and Questions */}
             <Grid2 size={6} >
-              <TextField id="" name="rondasQuantity" type="number" label="Rondas" variant="standard" fullWidth  autoComplete="off" 
-                value={ rondasQuantity }
-                onChange={ onRondasQuantityChange }
+              <TextField id="" name="roundsQuantity" type="number" label="Rondas" variant="standard" fullWidth  autoComplete="off" 
+                value={ roundsQuantity }
+                onChange={ onRoundsQuantityChange }
               />
             </Grid2>
             <Grid2 size={6} >
@@ -221,7 +251,7 @@ export const Form = ({ game, setGame }) => {
                 min={30}
                 max={180}
                 name="secondAnswer"
-                onChange={ onSecondAswerChange }  
+                onChange={ onSecondAnswerChange }  
               />
             </Grid2>
             <Grid2 size={6}>
@@ -233,26 +263,28 @@ export const Form = ({ game, setGame }) => {
             </Grid2>
             {/* Select the books, old or new */}
             <Grid2 size={6}>
-              <SelectBook books={oldBooksDB} name="Viejo" onBookSelecChange={onBookOldSelecChange} booksSelected={bookOldSelected} selectDisabled={disabledSelectOldBook}  />
+              <SelectBook books={oldBooksDB} name="Viejo" onBookSelecChange={onBookOldSelectChange} booksSelected={bookOldSelected} selectDisabled={disabledSelectOldBook}  />
             </Grid2>
             <Grid2 size={6}>
-              <SelectBook books={newBooksDB} name="Nuevo" onBookSelecChange={onBookNewSelecChange} booksSelected={bookNewSelected} selectDisabled={disabledSelectNewBook}  />
+              <SelectBook books={newBooksDB} name="Nuevo" onBookSelecChange={onBookNewSelectChange} booksSelected={bookNewSelected} selectDisabled={disabledSelectNewBook}  />
             </Grid2>
             <Grid2 size={12}>
             <FormGroup row sx={{ justifyContent: 'space-between'}} >
-                <FormControlLabel control={<Checkbox size="small" onClick={ onCheckOldBook } disabled={allBible}  />} label="Todo el viejo testamento"
+                <FormControlLabel control={<Checkbox size="small" onClick={ onCheckOldBook } disabled={(allBible || newBook)}  />} label="Todo el viejo testamento"
                   
                 />
-                <FormControlLabel control={<Checkbox size="small" onClick={ onCheckAllBible } />} label="Toda la biblia" 
+                <FormControlLabel control={<Checkbox size="small" onClick={ onCheckAllBible } disabled={(newBook || oldBook)}  />} label="Toda la biblia" 
                   
                 />
-                <FormControlLabel control={<Checkbox size="small" onClick={ onCheckNewBook } disabled={allBible} />} label="Todo el nuevo testamento" 
+                <FormControlLabel control={<Checkbox size="small" onClick={ onCheckNewBook } disabled={(allBible || oldBook)} />} label="Todo el nuevo testamento" 
                 />
               </FormGroup>
             </Grid2>
           </Grid2>
           <Box sx={{ mt: 5 }} >
             <Button variant="contained" sx={{ mr: 2 }}
+            disabled={btnStartDisabled}
+            onClick={ onStartGame }
             >Iniciar</Button>
             <Button variant="outlined"
             onClick={ onCancel }

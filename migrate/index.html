@@ -98,7 +98,7 @@
             <!-- End main content -->
             
             <!--game -->
-            <div id="game" class="d-none">
+            <div id="game" class="">
                 <div class="partida" >
                     <div class="participante mt-5">
                         <div class="container bg-white p-5 rounded">
@@ -1192,7 +1192,7 @@ export default {
 
                 if( libros.length != 0) {
                     libros.forEach(l => {
-                    preguntasPorLibro = juego.repositorioPreguntas.filter( p => p.libro == l);
+                        preguntasPorLibro = juego.repositorioPreguntas.filter( p => p.libro == l);
                         preguntas = preguntas.concat(preguntasPorLibro);
 
                     });

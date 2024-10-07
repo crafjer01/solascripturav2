@@ -5,7 +5,7 @@ export const Home = ({ game, setGame }) => {
   const onStart = () => {
     setGame({
       ...game,
-      'started': true
+      formStarted: true
     });
   }
   return (
