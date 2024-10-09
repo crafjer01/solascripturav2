@@ -196,6 +196,7 @@ export const Form = ({ game, setGame }) => {
         roundsQuantity: roundsQuantity,
         participants: participantList,
         secondAnswer,
+        questionsQuantity,
         formStarted: false,
         started: true
       });

@@ -3,8 +3,27 @@ import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import ExploreOffIcon from '@mui/icons-material/ExploreOff';
 import { AnswerOption } from './AnswerOption';
+import { useEffect, useRef } from 'react';
 
-export const Question = ({question, secondAnswerCounter }) => {
+export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer }) => {
+
+    const timeoutRef = useRef(null);
+
+    useEffect(() => {
+      if (currentSecondAnswer > 0) {
+        timeoutRef.current = setTimeout(() => {
+          setCurrentSecondAnswer((prev) => prev - 1);
+        }, 1000);
+      }
+  
+      return () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current); 
+        }
+      };
+    }, [currentSecondAnswer]);
+    
+
   return (
     <>
       {/* Question */}
@@ -39,7 +58,7 @@ export const Question = ({question, secondAnswerCounter }) => {
             }}
           >
             <Box className="clock" sx={{ background: "#00838f" }}>
-              {secondAnswerCounter}
+              { currentSecondAnswer }
             </Box>
           </Grid2>
         </Grid2>

@@ -13,6 +13,7 @@ export const SolaScripturaApp = () => {
     formStarted: false,
     started: false,
     secondAnswer: 30,
+    questionsQuantity: 5,
     roundsQuantity: null,
     participants: []
   });

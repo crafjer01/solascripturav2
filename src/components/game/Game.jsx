@@ -10,52 +10,79 @@ const init = () => {
 }
 
 export const Game = ({ game, setGame }) => {
+    const { roundsQuantity, participants, secondAnswer, questionsQuantity } = game;
+
     const { counter: roundCounter } = useCounter(1);
-    const { counter: participantCounter } = useCounter(0);
+    const { counter: participantCounter, increment: incrementParticipantCounter } = useCounter(0);
+    const { counter: questionCounter, increment: incrementQuestionCounter, reset: resetQuestionCounter } = useCounter(1);
+    const { counter: participantRound, increment: incrementParticipantRound } = useCounter(1);
     
     const [ currentParticipant, setCurrentParticipant ] = useState();
-    const [ question, setQuestion ] = useState(null);
+    const [ currentSecondAnswer, setCurrentSecondAnswer ] = useState(secondAnswer);
+    const [ currentQuestion, setCurrentQuestion ] = useState(null);
     const [ questions, dispatch ] = useReducer(questionReducer, [], init);
 
 
-    const { roundsQuantity, participants, secondAnswer } = game;
+   
 
-    const { counter: secondAnswerCounter, decrement: decrementSecondAnswer } = useCounter(secondAnswer);
+    const { counter: secondAnswerCounter, decrement: decrementSecondAnswer, reset: resetSecondAnswer } = useCounter(secondAnswer);
 
     useEffect(() => {
         setCurrentParticipant(participants[participantCounter]);
-        setQuestion(questions[0]);
-    }, []);
+        setCurrentQuestion(questions[0]);
+    }, [ questions ]);
 
-    useEffect(() => {
-        if (secondAnswerCounter > 0) {
-            setTimeout(() => {
-                decrementSecondAnswer();
-            }, 1000)
+    const nextQuestion = () => {
+        if ( questions.length > 0 ) {
+                
+            const proceedAction = {
+                type: 'PROCEED_QUESTION',
+                payload: { id: currentQuestion.id, proceed: true }
+            };
+            dispatch(proceedAction);
+        
+            if ( questionCounter < questionsQuantity ) {
+                incrementQuestionCounter();
+                const GetAction = {
+                    type: 'GET_QUESTION',
+                }        
+                dispatch(GetAction);
+                setCurrentSecondAnswer(secondAnswer);
+                setCurrentQuestion[0];
+            } else {
+                const GetAction = {
+                    type: 'GET_QUESTION',
+                }        
+                dispatch(GetAction);
+                setCurrentSecondAnswer(secondAnswer);
+                setCurrentQuestion[0];
+                resetQuestionCounter();
+                incrementParticipantRound();
+                incrementParticipantCounter();
+                setCurrentParticipant[participantCounter];
+            }
         }
-       ;
-    }, [ secondAnswerCounter ]);
+    }
 
-  
-
-    
-
-    // setting game 
   return (
     <Container maxWidth="lg" sx={{ mt: 5 }}>
         <Paper sx={{ p: 2 }}>
             {/*  */}
             <Typography variant='h5' component="h2" sx={{ textAlign: 'center', mb: 3 }}>Juego en curso</Typography>
             <Grid2 container spacing={2}>
-                <Grid2 size={4} sx={{ borderRight: '3px solid #00838f', borderRadius: '3px' }}>
-                    <Typography variant='h6' component="h2"><b>Participante:</b> {currentParticipant} </Typography>
-                    <Typography variant='h6' component="h2"><b>Ronda #:</b> { roundCounter }</Typography>
-                    {/* <Typography variant='h6' component="h2"><b>Rondas Canceladas:</b> 0</Typography> */}
+                <Grid2 container spacing={2} size={4} sx={{ flexDirection: 'column', justifyContent: 'space-between',  borderRight: '3px solid #00838f', borderRadius: '3px', }}>
+                    <Grid2>
+                        <Typography variant='h6' component="h2"><b>Participante:</b> {currentParticipant} </Typography>
+                    </Grid2>
+                    <Grid2>                        
+                        <Typography variant='h6' component="h2"><b>Ronda #:</b> { roundCounter }</Typography>
+                        <Typography variant='h6' component="h2"><b>Rondas Canceladas:</b> 0</Typography>
+                    </Grid2>
                 </Grid2>
                 <Grid2 size={8} >
                    
                     {/* Question */}
-                    <Question question={question} secondAnswerCounter={secondAnswerCounter} />
+                    <Question question={currentQuestion} currentSecondAnswer={currentSecondAnswer} setCurrentSecondAnswer={setCurrentSecondAnswer}  />
 
                     {/* Answer results and Navigate Buttons */}
                     <Grid2 container sx={{ pt: 2, borderTop: '4px solid #ccc'}}>
@@ -67,10 +94,16 @@ export const Game = ({ game, setGame }) => {
                         </Grid2>
                         <Grid2 size={12}>
                             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                                <Button variant="contained" sx={{ mr: 1 }}>Siguiente</Button>
+                                <Button variant="contained" sx={{ mr: 1 }}
+                                    onClick={ nextQuestion }
+                                >Siguiente</Button>
                                 <Button variant="contained" sx={{ mr: 1 }}>Pasar pregunta</Button>
-                                <Button variant="contained" sx={{ mr: 1 }}>Retirar Participante</Button>
-                                <Button variant="contained">Cancelar Ronda</Button>
+                                <Button variant="contained" sx={{ mr: 1 }}
+                                    disabled={participants.length ===  2}
+                                >Retirar Participante</Button>
+                                <Button variant="contained"
+                                    disabled={roundsQuantity === roundCounter }
+                                >Cancelar Ronda</Button>
                             </Box>
                             
                         </Grid2>
