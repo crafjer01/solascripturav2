@@ -1,8 +1,13 @@
 import { Container, Paper, Typography, Grid2, FormGroup, RadioGroup, FormControlLabel, Box, Radio, Fab, Button, Tooltip } from '@mui/material';
 import { useCounter } from '../../hooks/useCounter';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { Question } from './Question';
 import { repositoryQuestions } from '../../data/repositoryQuestions';
+import { questionReducer } from './questionReducer';
+
+const init = () => {
+    return repositoryQuestions;
+}
 
 export const Game = ({ game, setGame }) => {
     const { counter: roundCounter } = useCounter(1);
@@ -10,6 +15,8 @@ export const Game = ({ game, setGame }) => {
     
     const [ currentParticipant, setCurrentParticipant ] = useState();
     const [ question, setQuestion ] = useState(null);
+    const [ questions, dispatch ] = useReducer(questionReducer, [], init);
+
 
     const { roundsQuantity, participants, secondAnswer } = game;
 
@@ -17,7 +24,7 @@ export const Game = ({ game, setGame }) => {
 
     useEffect(() => {
         setCurrentParticipant(participants[participantCounter]);
-        setQuestion(repositoryQuestions[0]);
+        setQuestion(questions[0]);
     }, []);
 
     useEffect(() => {
