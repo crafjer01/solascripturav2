@@ -60,10 +60,10 @@ export const Game = ({ game, setGame }) => {
                         </Grid2>
                         <Grid2 size={12}>
                             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                                <Button variant="contained" sx={{ mr: 1 }}>Siguiente Ronda</Button>
+                                <Button variant="contained" sx={{ mr: 1 }}>Siguiente</Button>
                                 <Button variant="contained" sx={{ mr: 1 }}>Pasar pregunta</Button>
-                                <Button variant="contained" sx={{ mr: 1 }}>Cancelar Ronda</Button>
-                                <Button variant="contained">Siguiente Ronda</Button>
+                                <Button variant="contained" sx={{ mr: 1 }}>Retirar Participante</Button>
+                                <Button variant="contained">Cancelar Ronda</Button>
                             </Box>
                             
                         </Grid2>
