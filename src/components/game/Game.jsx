@@ -12,20 +12,24 @@ const init = () => {
 export const Game = ({ game, setGame }) => {
     const { roundsQuantity, participants, secondAnswer, questionsQuantity } = game;
 
-    const { counter: roundCounter } = useCounter(1);
-    const { counter: participantCounter, increment: incrementParticipantCounter } = useCounter(0);
+    const { counter: roundCounter, increment: incrementRoundCounter } = useCounter(1);
+    const { counter: participantCounter, increment: incrementParticipantCounter, reset: resetParticipantCounter } = useCounter(0);
     const { counter: questionCounter, increment: incrementQuestionCounter, reset: resetQuestionCounter } = useCounter(1);
-    const { counter: participantRound, increment: incrementParticipantRound } = useCounter(1);
+    const { counter: participantRound, increment: incrementParticipantRound, reset: resetParticipantRound } = useCounter(1);
     
     const [ currentParticipant, setCurrentParticipant ] = useState();
     const [ currentSecondAnswer, setCurrentSecondAnswer ] = useState(secondAnswer);
     const [ currentQuestion, setCurrentQuestion ] = useState(null);
     const [ questions, dispatch ] = useReducer(questionReducer, [], init);
+    const [ comodin, setComodin ] = useState({
+        _5050: false,
+        cite: false,
+        call: false
+    });
 
 
    
 
-    const { counter: secondAnswerCounter, decrement: decrementSecondAnswer, reset: resetSecondAnswer } = useCounter(secondAnswer);
 
     useEffect(() => {
         setCurrentParticipant(participants[participantCounter]);
@@ -41,25 +45,41 @@ export const Game = ({ game, setGame }) => {
             };
             dispatch(proceedAction);
         
-            if ( questionCounter < questionsQuantity ) {
-                incrementQuestionCounter();
-                const GetAction = {
-                    type: 'GET_QUESTION',
-                }        
-                dispatch(GetAction);
-                setCurrentSecondAnswer(secondAnswer);
-                setCurrentQuestion[0];
+            if ( questionCounter < questionsQuantity ) {                  
+                    incrementQuestionCounter();
+                    const GetAction = {
+                        type: 'GET_QUESTION',
+                    }        
+                    dispatch(GetAction);
+                    setCurrentSecondAnswer(secondAnswer);
+                    setCurrentQuestion[0];
+                
             } else {
                 const GetAction = {
                     type: 'GET_QUESTION',
                 }        
                 dispatch(GetAction);
-                setCurrentSecondAnswer(secondAnswer);
-                setCurrentQuestion[0];
-                resetQuestionCounter();
-                incrementParticipantRound();
-                incrementParticipantCounter();
-                setCurrentParticipant[participantCounter];
+
+                if ( participantRound === participants.length ) {
+                    incrementRoundCounter();
+                    setCurrentQuestion[0];
+                    setCurrentSecondAnswer(secondAnswer);
+                    resetQuestionCounter();
+                    resetParticipantCounter();
+                    resetParticipantRound();
+
+                    setCurrentParticipant[participantCounter];
+                } else {
+                    incrementParticipantRound();
+
+                    setCurrentQuestion[0];
+                    resetQuestionCounter();
+                    setCurrentSecondAnswer(secondAnswer);
+    
+                    incrementParticipantCounter();
+                    setCurrentParticipant[participantCounter];
+                }
+                
             }
         }
     }
@@ -82,7 +102,13 @@ export const Game = ({ game, setGame }) => {
                 <Grid2 size={8} >
                    
                     {/* Question */}
-                    <Question question={currentQuestion} currentSecondAnswer={currentSecondAnswer} setCurrentSecondAnswer={setCurrentSecondAnswer}  />
+                    <Question 
+                        question={currentQuestion} 
+                        currentSecondAnswer={currentSecondAnswer} 
+                        setCurrentSecondAnswer={setCurrentSecondAnswer}  
+                        comodin={comodin}
+                        setComodin={setComodin} 
+                        />
 
                     {/* Answer results and Navigate Buttons */}
                     <Grid2 container sx={{ pt: 2, borderTop: '4px solid #ccc'}}>

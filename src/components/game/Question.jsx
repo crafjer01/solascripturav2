@@ -5,7 +5,8 @@ import ExploreOffIcon from '@mui/icons-material/ExploreOff';
 import { AnswerOption } from './AnswerOption';
 import { useEffect, useRef } from 'react';
 
-export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer }) => {
+export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer, comodin, setComodin }) => {
+  const {_5050, call, cite} = comodin;
 
     const timeoutRef = useRef(null);
 
@@ -77,6 +78,10 @@ export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer 
               color="primary"
               aria-label="cite-bible"
               sx={{ mr: 1 }}
+              onClick={() => {
+                setComodin({...comodin,  cite: true });
+              }}
+              disabled={ cite }
             >
               <ImportContactsIcon />
             </Fab>
@@ -87,6 +92,10 @@ export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer 
               color="secondary"
               aria-label="call-a-friend"
               sx={{ mr: 1 }}
+              onClick={() => {
+                setComodin({...comodin,  call: true });
+              }}
+              disabled={ call }
             >
               <SmartphoneIcon />
             </Fab>
@@ -97,6 +106,10 @@ export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer 
               color="error"
               aria-label="fifty-fifty"
               sx={{ mr: 1 }}
+              onClick={() => {
+                setComodin({...comodin,  _5050: true });
+              }}
+              disabled={ _5050 }
             >
               <ExploreOffIcon />
             </Fab>
