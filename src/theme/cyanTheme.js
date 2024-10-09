@@ -9,9 +9,6 @@ export const cyanTheme = createTheme({
       light: colors.cyan[700],
       contrastText: '#ffffff'
     },
-    secondary: {
-      main: colors.orange[50],
-    },
     error: {
       main: colors.red.A400,
     },

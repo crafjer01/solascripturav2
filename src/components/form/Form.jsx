@@ -193,6 +193,8 @@ export const Form = ({ game, setGame }) => {
     const onStartGame = () => {
       setGame({
         ...game,
+        roundsQuantity: roundsQuantity,
+        participants: participantList,
         formStarted: false,
         started: true
       });

@@ -11,9 +11,11 @@ import { Game } from './components/game/Game';
 export const SolaScripturaApp = () => {
   const [game, setGame] = useState({
     formStarted: false,
-    started: false
+    started: false,
+    roundsQuantity: null,
+    participants: []
   });
-  const [ preloading, setPreloading ] = useState(true);
+  const [ preloading, setPreloading ] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -27,7 +29,7 @@ export const SolaScripturaApp = () => {
     <AppTheme>
         { preloading && <Preloading /> }
         <Navbar />
-        {  (!formStarted && !started) && <Home game={game} setGame={setGame} /> } 
+        { (!formStarted && !started) && <Home game={game} setGame={setGame} /> } 
         { (formStarted && !started) && <Form game={game} setGame={setGame} /> }
         { (started) && <Game game={game} setGame={setGame} /> }
     </AppTheme>

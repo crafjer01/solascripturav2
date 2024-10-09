@@ -25,7 +25,7 @@
 
 
       <!-- Materialize CSS -->
-      <link rel="stylesheet" href="assets/css/materialize.min.css">
+      <link rel="stylesheet" href="./assets/css/materialize.min.css">
 
     
     <!-- Bootstrap CSS -->
@@ -38,10 +38,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="./assets/css/app.css">
 
  
-    <link rel="stylesheet" href="assets/css/sweetalert2.min.css">
+    <link rel="stylesheet" href="./assets/css/sweetalert2.min.css">
 
     <title>SolaScriptura</title>
   </head>
@@ -61,7 +61,7 @@
             <nav class="navbar navbar-expand-lg navbar-dark bg-info">
                 <div class="container">
                     <a class="navbar-brand" href="#">
-                        <img src="../assets/images/logo.png" alt="logo de solascriptura" style="width: 91px;">
+                        <img src="./assets/images/logo.png" alt="logo de solascriptura" style="width: 91px;">
                     </a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -92,7 +92,7 @@
                 
                 </div>
                 <div class="col-md-6">
-                    <img class="img-fluid" src="../assets/images/logo.png" alt="solascriptura">
+                    <img class="img-fluid" src="./assets/images/logo.png" alt="solascriptura">
                 </div>
             </div>
             <!-- End main content -->
@@ -106,19 +106,19 @@
                             <div class="col-md-3 border-right border-info shadow-ms rounded">
                                 <div class="name-participant">
                                     <h3 class="font-weight-lighter">
-                                    <span class="font-weight-bold">Participante:</span> <br>
+                                    <span class="font-weight-bold">Participante: James</span> <br>
                                         <span class="name"></span>
                                     </h3>
                                 </div>
                                 <div class="round-participant">
                                     <h3 class="font-weight-lighter">
-                                    <span class="font-weight-bold">Ronda #:</span> <br>
+                                    <span class="font-weight-bold">Ronda #: 1</span> <br>
                                         <span class="round"></span>
                                     </h3>
                                 </div>
                                 <div class="round-participant">
                                     <h3 class="font-weight-lighter">
-                                    <span class="font-weight-bold">Rondas Cancelada:</span> <br>
+                                    <span class="font-weight-bold">Rondas Cancelada: 0</span> <br>
                                         <span class="round-cancel"></span>
                                     </h3>
                                 </div>
@@ -128,18 +128,45 @@
     <!--                           preguntas -->
                                 <div class="question">
                                     <div>
-                                        <h3 class="font-weight-lighter"></h3>
+                                        <h3 class="font-weight-lighter">Cual es el libro mas antigo?</h3>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-8">
-                                            <div class="answers mt-5"></div>
+                                            <div class="answers mt-5">
+                                                <div class="form-check m3">
+                                                    <input class="form-check-input" type="radio" name="answer1" id="answer1a" value="Genesis">
+                                                    <label class="form-check-label" for="answer1a">
+                                                        Genesis
+                                                    </label>
+                                                </div>
+                                                <div class="form-check m3">
+                                                    <input class="form-check-input" type="radio" name="answer1" id="answer1a" value="Genesis">
+                                                    <label class="form-check-label" for="answer1a">
+                                                        Genesis
+                                                    </label>
+                                                </div>
+                                                <div class="form-check m3">
+                                                    <input class="form-check-input" type="radio" name="answer1" id="answer1a" value="Genesis">
+                                                    <label class="form-check-label" for="answer1a">
+                                                        Genesis
+                                                    </label>
+                                                </div>
+                                                <div class="form-check m3">
+                                                    <input class="form-check-input" type="radio" name="answer1" id="answer1a" value="Genesis">
+                                                    <label class="form-check-label" for="answer1a">
+                                                        Genesis
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
                                         <div class="clock">
-                                            <div class="content"></div>
+                                            <div class="content">30</div>
                                         </div>
-                                        <div class="fixed-action-btn" 
-                                            :style="(participante.ajustarComodin) ? 'right: 121px !important; bottom: 48px !important;' : ''">
+                                        <div class="fixed-action-btn" style="right: 121px !important; bottom: 48px !important;" 
+                                             :style="(participante.ajustarComodin) ? 'right: 121px !important; bottom: 48px !important;' : ''" 
+                                            
+                                            >
                                             <a class="btn-floating">
                                                 <i class="large material-icons Comodines" data-position="bottom" data-tooltip="Comodines" @click="desplegarComodin">stars</i>
                                             </a>
@@ -162,7 +189,6 @@
                                                 </li>
                                             </ul>
                                             </div>
-                                            
                                         </div>
                                     </div>
 
@@ -177,14 +203,14 @@
                                                 <p>
                                                     <strong>Genial la repuesta correcta es : 
                                                     {{ pregunta.respuestaCorrecta }} </strong>
-                                                    <img src="../assets/FELIZ-SIN-FONDO.gif" alt="Feliz" style="margin-top: -30px; width: 150px; float: right">
+                                                    <img src="./assets/images/FELIZ-SIN-FONDO.gif" alt="Feliz" style="margin-top: -30px; width: 150px; float: right">
                                                 </p>
                                             </div>
                                             <div v-else>
                                                 <p>
                                                     <p><strong>Lo siento la repuesta correcta es : 
                                                     {{ pregunta.respuestaCorrecta }}</strong>
-                                                    <img src="../assets/TRISTE_SIN-FONDO.gif" alt="Triste" style="margin-top: -30px; width: 150px; float: right">
+                                                    <img src="./assets/images/TRISTE_SIN-FONDO.gif" alt="Triste" style="margin-top: -30px; width: 150px; float: right">
                                                 </p>
                                             </div> 
                                             <p><strong>Cita Biblica:</strong><em>{{ pregunta.cita }}</em></p>  
@@ -422,9 +448,9 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
-    <script src="assets/js/materialize.min.js"></script>
-    <script src="assets/js/app.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./assets/js/materialize.min.js"></script>
+    <script src="./assets/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>   
 export default {
     name: 'Home',

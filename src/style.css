@@ -23,3 +23,15 @@ img {
   overflow: hidden;
 }
 
+.clock {
+  display: block;
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  border-radius: 50%;
+  text-align: center;
+  color: white;
+  font-size: 41px;
+  font-weight: 700;
+}
+
