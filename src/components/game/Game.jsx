@@ -3,19 +3,32 @@ import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import ExploreOffIcon from '@mui/icons-material/ExploreOff';
 import { useCounter } from '../../hooks/useCounter';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 export const Game = ({ game, setGame }) => {
     const { counter: roundCounter } = useCounter(1);
+    const { counter: participantCounter } = useCounter(0);
+    
     const [ currentParticipant, setCurrentParticipant ] = useState();
 
-    const { roundsQuantity, participants } = game;
+    const { roundsQuantity, participants, secondAnswer } = game;
 
+    const { counter: secondAnswerCounter, decrement: decrementSecondAnswer } = useCounter(secondAnswer);
 
     useEffect(() => {
-       setCurrentParticipant(participants[0])
-    }, [ ]);
+        setCurrentParticipant(participants[participantCounter]);
+    }, []);
 
+    useEffect(() => {
+        if (secondAnswerCounter > 0) {
+            setTimeout(() => {
+                decrementSecondAnswer();
+            }, 1000)
+        }
+       ;
+    }, [ secondAnswerCounter ]);
+
+  
 
     
 
@@ -23,10 +36,11 @@ export const Game = ({ game, setGame }) => {
   return (
     <Container maxWidth="lg" sx={{ mt: 5 }}>
         <Paper sx={{ p: 2 }}>
-        <Typography variant='h5' component="h2" sx={{ textAlign: 'center', mb: 3 }}>Juego en curso</Typography>
+            {/*  */}
+            <Typography variant='h5' component="h2" sx={{ textAlign: 'center', mb: 3 }}>Juego en curso</Typography>
             <Grid2 container spacing={2}>
                 <Grid2 size={4} sx={{ borderRight: '3px solid #00838f', borderRadius: '3px' }}>
-                    <Typography variant='h6' component="h2"><b>Participante:</b> { currentParticipant }</Typography>
+                    <Typography variant='h6' component="h2"><b>Participante:</b> {currentParticipant} </Typography>
                     <Typography variant='h6' component="h2"><b>Ronda #:</b> { roundCounter }</Typography>
                     {/* <Typography variant='h6' component="h2"><b>Rondas Canceladas:</b> 0</Typography> */}
                 </Grid2>
@@ -35,13 +49,11 @@ export const Game = ({ game, setGame }) => {
                     <Typography variant='h5' component="h2" >
                         Cual es el libro mas antigo?
                     </Typography>
-
                     {/* Answwers list and Clock */}
                     <Grid2 container spacing={2} sx={{ mt: 2, justifyContent: 'space-between' }}>
                         <Grid2 size={8} >
-                            <FormGroup container>
+                            <FormGroup>
                                 <RadioGroup 
-                                    container
                                     aria-labelledby="answer-radio-buttons"
                                     name="answer-radio-buttons"
                                 >
@@ -55,7 +67,7 @@ export const Game = ({ game, setGame }) => {
                         <Grid2 size={4} >
                             <Grid2   sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', p: 2 }}>
                                 <Box className="clock" sx={{ background:  '#00838f'}}>
-                                    30
+                                    { secondAnswerCounter }
                                 </Box>
                             </Grid2>
                         </Grid2>
@@ -100,6 +112,7 @@ export const Game = ({ game, setGame }) => {
                             
                         </Grid2>
                     </Grid2>
+
                 </Grid2>
             </Grid2>
         </Paper>

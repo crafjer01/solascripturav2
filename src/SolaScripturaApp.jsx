@@ -12,6 +12,7 @@ export const SolaScripturaApp = () => {
   const [game, setGame] = useState({
     formStarted: false,
     started: false,
+    secondAnswer: 30,
     roundsQuantity: null,
     participants: []
   });
