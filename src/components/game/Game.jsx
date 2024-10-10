@@ -4,6 +4,7 @@ import { useEffect, useReducer, useState } from 'react';
 import { Question } from './Question';
 import { repositoryQuestions } from '../../data/repositoryQuestions';
 import { questionReducer } from './questionReducer';
+import { NavigationButtons } from './NavigationButtons';
 
 const init = () => {
     return repositoryQuestions;
@@ -44,7 +45,7 @@ export const Game = ({ game, setGame }) => {
     setCurrentSecondAnswer(0);
   }
 
-    const nextQuestion = () => {
+    const onNextQuestion = () => {
         if ( questions.length > 0 ) {
                 
             const proceedAction = {
@@ -131,33 +132,14 @@ export const Game = ({ game, setGame }) => {
                         onSelectAnswer={onSelectAnswer}
                         answerSelected={answerSelected}
                         setAnswerSelected={setAnswerSelected}
-                        />
-
-                    {/* Answer results and Navigate Buttons */}
-                    <Grid2 container sx={{ pt: 2, borderTop: '4px solid #ccc'}}>
-                        <Grid2 size={12}>
-                            <Typography variant="body1" component="p">Genial la repuesta correcta es </Typography>
-                            <Typography variant="body1" component="p">Lo siento la repuesta correcta es </Typography>
-                            <Typography variant="body1" component="p">Cita Biblica:</Typography>
-                            <Typography variant="body1" component="p">Tienes la oportunidad de preguntarle a alguien dentro de la sala o fuera de la sala.</Typography>
-                        </Grid2>
-                        <Grid2 size={12}>
-                            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                                <Button variant="contained" sx={{ mr: 1 }}
-                                    onClick={ nextQuestion }
-                                >Siguiente</Button>
-                                <Button variant="contained" sx={{ mr: 1 }}>Pasar pregunta</Button>
-                                <Button variant="contained" sx={{ mr: 1 }}
-                                    disabled={participants.length ===  2}
-                                >Retirar Participante</Button>
-                                <Button variant="contained"
-                                    disabled={roundsQuantity === roundCounter }
-                                >Cancelar Ronda</Button>
-                            </Box>
-                            
-                        </Grid2>
-                    </Grid2>
-
+                    />
+                    <NavigationButtons 
+                        onNextQuestion={ onNextQuestion }
+                        participants={ participants }
+                        roundsQuantity={ roundsQuantity }
+                        roundCounter={ roundCounter }
+                    />
+                     
                 </Grid2>
             </Grid2>
         </Paper>

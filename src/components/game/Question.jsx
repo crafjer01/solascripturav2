@@ -4,6 +4,7 @@ import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import ExploreOffIcon from '@mui/icons-material/ExploreOff';
 import { AnswerOption } from './AnswerOption';
 import { useEffect, useRef } from 'react';
+import { AnswerResult } from './AnswerResult';
 
 export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer, comodin, setComodin, answerSelected, setIsAnswerCorrect, onSelectAnswer }) => {
   const {_5050, call, cite} = comodin;
@@ -122,6 +123,8 @@ export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer,
           </Tooltip>
         </Grid2>
       </Grid2>
+      
+      <AnswerResult />
     </>
   );
 };
