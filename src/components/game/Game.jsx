@@ -26,6 +26,8 @@ export const Game = ({ game, setGame }) => {
         cite: false,
         call: false
     });
+    const [ isAnswerCorrect, setIsAnswerCorrect ] = useState(false);
+    const [ answerSelected, setAnswerSelected ] = useState('');
 
 
    
@@ -35,6 +37,12 @@ export const Game = ({ game, setGame }) => {
         setCurrentParticipant(participants[participantCounter]);
         setCurrentQuestion(questions[0]);
     }, [ questions ]);
+
+    
+  const onSelectAnswer = (answer) => {
+    setAnswerSelected(answer);
+    setCurrentSecondAnswer(0);
+  }
 
     const nextQuestion = () => {
         if ( questions.length > 0 ) {
@@ -53,6 +61,7 @@ export const Game = ({ game, setGame }) => {
                     dispatch(GetAction);
                     setCurrentSecondAnswer(secondAnswer);
                     setCurrentQuestion[0];
+                    setAnswerSelected('');
                 
             } else {
                 const GetAction = {
@@ -71,7 +80,8 @@ export const Game = ({ game, setGame }) => {
                         _5050: false,
                         cite: false,
                         call: false
-                    })
+                    });
+                    setAnswerSelected('');
 
                     setCurrentParticipant[participantCounter];
                 } else {
@@ -117,6 +127,10 @@ export const Game = ({ game, setGame }) => {
                         setCurrentSecondAnswer={setCurrentSecondAnswer}  
                         comodin={comodin}
                         setComodin={setComodin} 
+                        setIsAnswerCorrect={setIsAnswerCorrect}
+                        onSelectAnswer={onSelectAnswer}
+                        answerSelected={answerSelected}
+                        setAnswerSelected={setAnswerSelected}
                         />
 
                     {/* Answer results and Navigate Buttons */}

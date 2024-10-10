@@ -3,13 +3,10 @@ import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import ExploreOffIcon from '@mui/icons-material/ExploreOff';
 import { AnswerOption } from './AnswerOption';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
-export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer, comodin, setComodin }) => {
+export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer, comodin, setComodin, answerSelected, setIsAnswerCorrect, onSelectAnswer }) => {
   const {_5050, call, cite} = comodin;
-
-  const [ answerSelected, setAnswerSelected ] = useState('');
-
 
   const timeoutRef = useRef(null);
 
@@ -27,12 +24,7 @@ export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer,
     };
   }, [currentSecondAnswer]);
 
-  const onSelectAnswer = (answer) => {
-    setAnswerSelected(answer);
-    setCurrentSecondAnswer(0);
-  }
-    
-
+  
   return (
     <>
       {/* Question */}
@@ -51,7 +43,13 @@ export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer,
               name="answer-radio-buttons"
             >
                 { question?.answers.map(answer => (
-                    <AnswerOption key={answer.description} answer={answer}  onSelectAnswer={onSelectAnswer} answerSelected={answerSelected} />
+                    <AnswerOption 
+                        key={answer.description} 
+                        answer={answer}  
+                        onSelectAnswer={onSelectAnswer} 
+                        answerSelected={answerSelected}
+                        setIsAnswerCorrect={setIsAnswerCorrect} 
+                    />
                 )) }
             </RadioGroup>
           </FormGroup>
