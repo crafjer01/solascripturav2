@@ -5,6 +5,7 @@ import { Question } from './Question';
 import { repositoryQuestions } from '../../data/repositoryQuestions';
 import { questionReducer } from './questionReducer';
 import { NavigationButtons } from './NavigationButtons';
+import { ParticipantPanel } from './ParticipantPanel';
 
 const init = () => {
     return repositoryQuestions;
@@ -18,7 +19,13 @@ export const Game = ({ game, setGame }) => {
     const { counter: questionCounter, increment: incrementQuestionCounter, reset: resetQuestionCounter } = useCounter(1);
     const { counter: participantRound, increment: incrementParticipantRound, reset: resetParticipantRound } = useCounter(1);
     
-    const [ currentParticipant, setCurrentParticipant ] = useState();
+    const [ currentParticipant, setCurrentParticipant ] = useState({
+        name: '',
+        answered: 0,
+        guess: 0,
+        fail: 0,
+        skip: 0
+    });
     const [ currentSecondAnswer, setCurrentSecondAnswer ] = useState(secondAnswer);
     const [ currentQuestion, setCurrentQuestion ] = useState(null);
     const [ questions, dispatch ] = useReducer(questionReducer, [], init);
@@ -35,7 +42,10 @@ export const Game = ({ game, setGame }) => {
 
 
     useEffect(() => {
-        setCurrentParticipant(participants[participantCounter]);
+        setCurrentParticipant({
+            ...currentParticipant,
+            name: participants[participantCounter]
+    });
         setCurrentQuestion(questions[0]);
     }, [ questions ]);
 
@@ -95,7 +105,7 @@ export const Game = ({ game, setGame }) => {
                     setCurrentQuestion[0];
                     resetQuestionCounter();
                     setCurrentSecondAnswer(secondAnswer);
-    
+                    setAnswerSelected('');
                     incrementParticipantCounter();
                     setCurrentParticipant[participantCounter];
                 }
@@ -110,15 +120,10 @@ export const Game = ({ game, setGame }) => {
             {/*  */}
             <Typography variant='h5' component="h2" sx={{ textAlign: 'center', mb: 3 }}>Juego en curso</Typography>
             <Grid2 container spacing={2}>
-                <Grid2 container spacing={2} size={4} sx={{ flexDirection: 'column', justifyContent: 'space-between',  borderRight: '3px solid #00838f', borderRadius: '3px', }}>
-                    <Grid2>
-                        <Typography variant='h6' component="h2"><b>Participante:</b> {currentParticipant} </Typography>
-                    </Grid2>
-                    <Grid2>                        
-                        <Typography variant='h6' component="h2"><b>Ronda #:</b> { roundCounter }</Typography>
-                        <Typography variant='h6' component="h2"><b>Rondas Canceladas:</b> 0</Typography>
-                    </Grid2>
-                </Grid2>
+                <ParticipantPanel 
+                    currentParticipant={ currentParticipant } 
+                    roundCounter={ roundCounter }
+                />
                 <Grid2 size={8} >
                    
                     {/* Question */}
@@ -132,12 +137,14 @@ export const Game = ({ game, setGame }) => {
                         onSelectAnswer={onSelectAnswer}
                         answerSelected={answerSelected}
                         setAnswerSelected={setAnswerSelected}
+                        isAnswerCorrect={isAnswerCorrect}
                     />
                     <NavigationButtons 
                         onNextQuestion={ onNextQuestion }
                         participants={ participants }
                         roundsQuantity={ roundsQuantity }
                         roundCounter={ roundCounter }
+                        answerSelected={ answerSelected }
                     />
                      
                 </Grid2>

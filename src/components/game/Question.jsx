@@ -6,9 +6,11 @@ import { AnswerOption } from './AnswerOption';
 import { useEffect, useRef } from 'react';
 import { AnswerResult } from './AnswerResult';
 
-export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer, comodin, setComodin, answerSelected, setIsAnswerCorrect, onSelectAnswer }) => {
+export const Question = ({
+  question, currentSecondAnswer, setCurrentSecondAnswer, comodin, setComodin, 
+  answerSelected, setIsAnswerCorrect, onSelectAnswer, isAnswerCorrect }) => {
+    
   const {_5050, call, cite} = comodin;
-
   const timeoutRef = useRef(null);
 
   useEffect(() => {
@@ -124,7 +126,9 @@ export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer,
         </Grid2>
       </Grid2>
       
-      <AnswerResult />
+      <AnswerResult 
+        isAnswerCorrect={isAnswerCorrect}
+      />
     </>
   );
 };
