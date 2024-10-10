@@ -67,11 +67,20 @@ export const Game = ({ game, setGame }) => {
                     resetQuestionCounter();
                     resetParticipantCounter();
                     resetParticipantRound();
+                    setComodin({
+                        _5050: false,
+                        cite: false,
+                        call: false
+                    })
 
                     setCurrentParticipant[participantCounter];
                 } else {
                     incrementParticipantRound();
-
+                    setComodin({
+                        _5050: false,
+                        cite: false,
+                        call: false
+                    });
                     setCurrentQuestion[0];
                     resetQuestionCounter();
                     setCurrentSecondAnswer(secondAnswer);

@@ -3,26 +3,34 @@ import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import ExploreOffIcon from '@mui/icons-material/ExploreOff';
 import { AnswerOption } from './AnswerOption';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer, comodin, setComodin }) => {
   const {_5050, call, cite} = comodin;
 
-    const timeoutRef = useRef(null);
+  const [ answerSelected, setAnswerSelected ] = useState('');
 
-    useEffect(() => {
-      if (currentSecondAnswer > 0) {
-        timeoutRef.current = setTimeout(() => {
-          setCurrentSecondAnswer((prev) => prev - 1);
-        }, 1000);
+
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (currentSecondAnswer > 0) {
+      timeoutRef.current = setTimeout(() => {
+        setCurrentSecondAnswer((prev) => prev - 1);
+      }, 1000);
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current); 
       }
-  
-      return () => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current); 
-        }
-      };
-    }, [currentSecondAnswer]);
+    };
+  }, [currentSecondAnswer]);
+
+  const onSelectAnswer = (answer) => {
+    setAnswerSelected(answer);
+    setCurrentSecondAnswer(0);
+  }
     
 
   return (
@@ -43,7 +51,7 @@ export const Question = ({question, currentSecondAnswer, setCurrentSecondAnswer,
               name="answer-radio-buttons"
             >
                 { question?.answers.map(answer => (
-                    <AnswerOption key={answer.description} answer={answer}  />
+                    <AnswerOption key={answer.description} answer={answer}  onSelectAnswer={onSelectAnswer} answerSelected={answerSelected} />
                 )) }
             </RadioGroup>
           </FormGroup>
