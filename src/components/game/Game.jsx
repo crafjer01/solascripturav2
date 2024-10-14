@@ -1,24 +1,22 @@
-import { Container, Paper, Typography, Grid2, FormGroup, RadioGroup, FormControlLabel, Box, Radio, Fab, Button, Tooltip } from '@mui/material';
-import { useCounter } from '../../hooks/useCounter';
-import { useEffect, useReducer, useState } from 'react';
+import { Container, Paper, Typography, Grid2 } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { Question } from './Question';
 import { repositoryQuestions } from '../../data/repositoryQuestions';
-import { questionReducer } from './questionReducer';
 import { NavigationButtons } from './NavigationButtons';
 import { ParticipantPanel } from './ParticipantPanel';
+import { saveCurrentParticipant } from '../../helpers/helpers';
 
 const init = () => {
     return repositoryQuestions;
 }
 
+let roundCounter = 1
+let participantRound = 1;
+let questionCounter = 1;
+let participantCounter = 0;
+
 export const Game = ({ game, setGame }) => {
     const { roundsQuantity, participants, secondAnswer, questionsQuantity } = game;
-
-    const { counter: roundCounter, increment: incrementRoundCounter } = useCounter(1);
-    const { counter: participantCounter, increment: incrementParticipantCounter, reset: resetParticipantCounter } = useCounter(0);
-    const { counter: questionCounter, increment: incrementQuestionCounter, reset: resetQuestionCounter } = useCounter(1);
-    const { counter: participantRound, increment: incrementParticipantRound, reset: resetParticipantRound } = useCounter(1);
-    
     const [ currentParticipant, setCurrentParticipant ] = useState({
         name: '',
         answered: 0,
@@ -26,9 +24,10 @@ export const Game = ({ game, setGame }) => {
         fail: 0,
         skip: 0
     });
+
     const [ currentSecondAnswer, setCurrentSecondAnswer ] = useState(secondAnswer);
     const [ currentQuestion, setCurrentQuestion ] = useState(null);
-    const [ questions, dispatch ] = useReducer(questionReducer, [], init);
+    const [ questions, setQuestions ] = useState(repositoryQuestions);
     const [ comodin, setComodin ] = useState({
         _5050: false,
         cite: false,
@@ -36,78 +35,86 @@ export const Game = ({ game, setGame }) => {
     });
     const [ isAnswerCorrect, setIsAnswerCorrect ] = useState(false);
     const [ answerSelected, setAnswerSelected ] = useState('');
-
-
-   
-
+    const [ currentQuestionProceed, setCurrentQuestionProceed ] = useState(false);
 
     useEffect(() => {
         setCurrentParticipant({
             ...currentParticipant,
             name: participants[participantCounter]
-    });
-        setCurrentQuestion(questions[0]);
-    }, [ questions ]);
+        });
+        localStorage.setItem('questions', JSON.stringify(questions));
+        localStorage.setItem('participants', JSON.stringify([]));
+        setCurrentQuestion( repositoryQuestions[0] );
+
+    }, []);
 
     
-  const onSelectAnswer = (answer) => {
-    setAnswerSelected(answer);
-    setCurrentSecondAnswer(0);
-  }
+    const onSelectAnswer = (answer) => {
+        setAnswerSelected(answer);
+        setCurrentSecondAnswer(0);
+    }
 
     const onNextQuestion = () => {
         if ( questions.length > 0 ) {
-                
-            const proceedAction = {
-                type: 'PROCEED_QUESTION',
-                payload: { id: currentQuestion.id, proceed: true }
-            };
-            dispatch(proceedAction);
-        
+            
+            // Siguiente pregunta y actualiza la lista de preguntas
             if ( questionCounter < questionsQuantity ) {                  
-                    incrementQuestionCounter();
-                    const GetAction = {
-                        type: 'GET_QUESTION',
-                    }        
-                    dispatch(GetAction);
-                    setCurrentSecondAnswer(secondAnswer);
-                    setCurrentQuestion[0];
-                    setAnswerSelected('');
+                questionCounter = questionCounter + 1;
+                setCurrentSecondAnswer(secondAnswer);
+                setAnswerSelected('');
+                setCurrentQuestionProceed(false);
+                setCurrentQuestion(questions[0]);
                 
             } else {
-                const GetAction = {
-                    type: 'GET_QUESTION',
-                }        
-                dispatch(GetAction);
-
-                if ( participantRound === participants.length ) {
-                    incrementRoundCounter();
-                    setCurrentQuestion[0];
+                // Siguiente Participante de la ronda
+                if ( participantRound < participants.length ) {
+                    saveCurrentParticipant(currentParticipant);
+                    // Resetea los contadores 
+                    participantRound = participantRound + 1;
+                    participantCounter = participantCounter + 1;
+                    questionCounter = 1;
                     setCurrentSecondAnswer(secondAnswer);
-                    resetQuestionCounter();
-                    resetParticipantCounter();
-                    resetParticipantRound();
-                    setComodin({
-                        _5050: false,
-                        cite: false,
-                        call: false
-                    });
                     setAnswerSelected('');
-
-                    setCurrentParticipant[participantCounter];
+                    setComodin({ _5050: false,cite: false,call: false }); 
+                    setCurrentParticipant({ 
+                        name: participants[participantCounter], 
+                        answered: 0, 
+                        guess: 0,
+                        fail: 0,
+                        skip: 0 
+                    });
+                    setCurrentQuestionProceed(false);
+                    setCurrentQuestion(questions[0]);
                 } else {
-                    incrementParticipantRound();
-                    setComodin({
-                        _5050: false,
-                        cite: false,
-                        call: false
-                    });
-                    setCurrentQuestion[0];
-                    resetQuestionCounter();
-                    setCurrentSecondAnswer(secondAnswer);
-                    setAnswerSelected('');
-                    incrementParticipantCounter();
-                    setCurrentParticipant[participantCounter];
+                    // Siguiente ronda
+                    if ( roundCounter < roundsQuantity ) {
+                        saveCurrentParticipant(currentParticipant);
+                        roundCounter = roundCounter + 1;
+                        participantRound = 1;
+                        participantCounter = 0; 
+                        questionCounter = 1;
+                        setCurrentSecondAnswer(secondAnswer);
+                        setAnswerSelected('');
+                        setComodin({ _5050: false, cite: false, call: false });                                     
+                        setCurrentParticipant({ 
+                            name: participants[participantCounter], 
+                            answered: 0, 
+                            guess: 0,
+                            fail: 0,
+                            skip: 0 
+                        });
+                        setCurrentQuestionProceed(false);
+                        setCurrentQuestion(questions[0]);
+                    } else {
+                        // Finalizar el juego
+                        saveCurrentParticipant(currentParticipant);
+                        setGame({
+                            ...game,
+                            end: true
+                        });
+                        alert('Fin del juego');
+                    }
+                   
                 }
                 
             }
@@ -128,7 +135,8 @@ export const Game = ({ game, setGame }) => {
                    
                     {/* Question */}
                     <Question 
-                        question={currentQuestion} 
+                        currentQuestion={currentQuestion} 
+                        setCurrentQuestion={ setCurrentQuestion }
                         currentSecondAnswer={currentSecondAnswer} 
                         setCurrentSecondAnswer={setCurrentSecondAnswer}  
                         comodin={comodin}
@@ -137,14 +145,20 @@ export const Game = ({ game, setGame }) => {
                         onSelectAnswer={onSelectAnswer}
                         answerSelected={answerSelected}
                         setAnswerSelected={setAnswerSelected}
-                        isAnswerCorrect={isAnswerCorrect}
+                        isAnswerCorrect={isAnswerCorrect}                        
+                        questions={ questions }
+                        setQuestions={ setQuestions }
+                        currentQuestionProceed={currentQuestionProceed}
+                        setCurrentQuestionProceed={ setCurrentQuestionProceed }
+                        currentParticipant={currentParticipant}
+                        setCurrentParticipant={setCurrentParticipant}
                     />
                     <NavigationButtons 
                         onNextQuestion={ onNextQuestion }
+                        answerSelected={ answerSelected }  
                         participants={ participants }
                         roundsQuantity={ roundsQuantity }
                         roundCounter={ roundCounter }
-                        answerSelected={ answerSelected }
                     />
                      
                 </Grid2>

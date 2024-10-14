@@ -5,13 +5,20 @@ export const questionReducer = (state = [], action) => {
         case 'UPDATE_QUESTION':
             return state;
         case 'PROCEED_QUESTION':
+            const myEntries = Object.entries(action.payload.questionProceed);
+
+            let questionProceed = {}
+            myEntries.forEach(entries => {
+                const [key, value] = entries;   
+                questionProceed[key] = value; 
+            });
+
             return state.map(question =>
                 question.id === action.payload.id
-                   ? {...question, proceed: action.payload.proceed }
+                   ? {...question,  ...questionProceed}
                     : question
             );
-        case 'GET_QUESTION':
-            return state.filter(question => question.proceed === false);
+            
         default:
             return state;
     }

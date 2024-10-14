@@ -1,15 +1,16 @@
 import { Grid2, Box, Button } from '@mui/material';
 
-export const NavigationButtons = ({ onNextQuestion, participants, roundsQuantity, roundCounter, answerSelected }) => {
+export const NavigationButtons = ({ onNextQuestion, answerSelected, participants, roundsQuantity, roundCounter }) => {
+
   return (
-    <Grid2 container size={12} sx={{ mt: 2, mb: 2 }}>
+    <Grid2 container size={12} sx={{ mt: 4, mb: 2 }}>
       <Grid2>
         <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
           <Button 
                 variant="contained" 
                 sx={{ mr: 1 }} 
                 onClick={ onNextQuestion }
-                disabled={!answerSelected}
+                disabled={ !answerSelected }
             >
             Siguiente
           </Button>

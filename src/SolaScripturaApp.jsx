@@ -6,12 +6,14 @@ import { Form } from './components/form/Form';
 import { AppTheme } from './theme/AppTheme'
 import { Preloading } from './components/preloading/Preloading';
 import { Game } from './components/game/Game';
+import { FinalPanel } from './components/game/FinalPanel';
 
 
 export const SolaScripturaApp = () => {
   const [game, setGame] = useState({
     formStarted: false,
     started: false,
+    end: false,
     secondAnswer: 30,
     questionsQuantity: 5,
     roundsQuantity: null,
@@ -25,7 +27,7 @@ export const SolaScripturaApp = () => {
     }, 9500);
   }, []);
 
-  const { formStarted, started } = game;
+  const { formStarted, started, end } = game;
 
   return (
     <AppTheme>
@@ -33,7 +35,8 @@ export const SolaScripturaApp = () => {
         <Navbar />
         { (!formStarted && !started) && <Home game={game} setGame={setGame} /> } 
         { (formStarted && !started) && <Form game={game} setGame={setGame} /> }
-        { (started) && <Game game={game} setGame={setGame} /> }
+        { (started && !end) && <Game game={game} setGame={setGame} /> }
+        { (end) && <FinalPanel /> }
     </AppTheme>
   )
 }

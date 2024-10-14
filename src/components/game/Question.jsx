@@ -3,15 +3,20 @@ import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import ExploreOffIcon from '@mui/icons-material/ExploreOff';
 import { AnswerOption } from './AnswerOption';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnswerResult } from './AnswerResult';
 
 export const Question = ({
-  question, currentSecondAnswer, setCurrentSecondAnswer, comodin, setComodin, 
-  answerSelected, setIsAnswerCorrect, onSelectAnswer, isAnswerCorrect }) => {
-    
+  currentQuestion, currentSecondAnswer, setCurrentSecondAnswer, comodin, setComodin, 
+  answerSelected, setIsAnswerCorrect, onSelectAnswer, isAnswerCorrect,
+  setCurrentQuestion, questions, setQuestions, currentQuestionProceed, setCurrentQuestionProceed,
+  currentParticipant, setCurrentParticipant
+}) => {    
+
   const {_5050, call, cite} = comodin;
   const timeoutRef = useRef(null);
+
+  const answers = currentQuestion?.answers;
 
   useEffect(() => {
     if (currentSecondAnswer > 0) {
@@ -27,11 +32,27 @@ export const Question = ({
     };
   }, [currentSecondAnswer]);
 
+
+  const useComodinCite = () => {
+    setComodin({...comodin,  cite: true });
+    currentQuestion.comodin_cite_used = true;
+  }
+
+  const useComodinCall = () => {
+    setComodin({...comodin,  call: true });
+    currentQuestion.comodin_call_used = true;
+  }
+
+  const useComodin5050 = () => {
+    setComodin({...comodin,  _5050: true });
+    currentQuestion.comodin_500_used = true;
+  }
+
   
   return (
     <>
       {/* Question */}
-      <Typography variant="h5" component="h2">{ question?.description }</Typography>
+      <Typography variant="h5" component="h2">{ currentQuestion?.description }</Typography>
       
       {/* Answwers list and Clock */}
       <Grid2
@@ -45,13 +66,20 @@ export const Question = ({
               aria-labelledby="answer-radio-buttons"
               name="answer-radio-buttons"
             >
-                { question?.answers.map(answer => (
+                { answers?.map(answer => (
                     <AnswerOption 
                         key={answer.description} 
                         answer={answer}  
                         onSelectAnswer={onSelectAnswer} 
                         answerSelected={answerSelected}
-                        setIsAnswerCorrect={setIsAnswerCorrect} 
+                        setIsAnswerCorrect={setIsAnswerCorrect}
+                        currentQuestion={ currentQuestion }
+                        setCurrentQuestion={ setCurrentQuestion }
+                        questions={ questions }
+                        setQuestions={ setQuestions }
+                        setCurrentQuestionProceed={setCurrentQuestionProceed}
+                        currentParticipant={ currentParticipant }
+                        setCurrentParticipant={ setCurrentParticipant } 
                     />
                 )) }
             </RadioGroup>
@@ -87,9 +115,7 @@ export const Question = ({
               color="primary"
               aria-label="cite-bible"
               sx={{ mr: 1 }}
-              onClick={() => {
-                setComodin({...comodin,  cite: true });
-              }}
+              onClick={ useComodinCite }
               disabled={ cite }
             >
               <ImportContactsIcon />
@@ -101,9 +127,7 @@ export const Question = ({
               color="secondary"
               aria-label="call-a-friend"
               sx={{ mr: 1 }}
-              onClick={() => {
-                setComodin({...comodin,  call: true });
-              }}
+              onClick={ useComodinCall }
               disabled={ call }
             >
               <SmartphoneIcon />
@@ -115,9 +139,7 @@ export const Question = ({
               color="error"
               aria-label="fifty-fifty"
               sx={{ mr: 1 }}
-              onClick={() => {
-                setComodin({...comodin,  _5050: true });
-              }}
+              onClick={ useComodin5050 }
               disabled={ _5050 }
             >
               <ExploreOffIcon />
@@ -128,6 +150,11 @@ export const Question = ({
       
       <AnswerResult 
         isAnswerCorrect={isAnswerCorrect}
+        answerSelected={ answerSelected }
+        currentQuestion={currentQuestion}
+        comodinCall={ call }
+        comodinCite={ cite }
+        currentQuestionProceed={currentQuestionProceed}
       />
     </>
   );
