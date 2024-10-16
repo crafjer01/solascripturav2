@@ -1,14 +1,12 @@
-import { Container, Paper, Typography, Grid2 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { Container, Paper, Typography, Grid2 } from '@mui/material';
 import { Question } from './Question';
-import { repositoryQuestions } from '../../data/repositoryQuestions';
 import { NavigationButtons } from './NavigationButtons';
 import { ParticipantPanel } from './ParticipantPanel';
+
+import { repositoryQuestions } from '../../data/repositoryQuestions';
 import { saveCurrentParticipant } from '../../helpers/helpers';
 
-const init = () => {
-    return repositoryQuestions;
-}
 
 let roundCounter = 1
 let participantRound = 1;
@@ -54,69 +52,93 @@ export const Game = ({ game, setGame }) => {
         setCurrentSecondAnswer(0);
     }
 
+    const hasQuestions =  questions.length > 0;
+
+    const isLastQuestion = questionCounter < questionsQuantity;
+
+    const getNextQuestion = () => {
+        questionCounter = questionCounter + 1;
+        setCurrentSecondAnswer(secondAnswer);
+        setAnswerSelected('');
+        setCurrentQuestionProceed(false);
+        setCurrentQuestion(questions[0]);
+    }
+
+    const hasParticipants = participantRound < participants.length;
+
+    const getNextParticipant = () => {
+        saveCurrentParticipant(currentParticipant);
+        // Resetea los contadores 
+        participantRound = participantRound + 1;
+        participantCounter = participantCounter + 1;
+        questionCounter = 1;
+        setCurrentSecondAnswer(secondAnswer);
+        setAnswerSelected('');
+        setComodin({ _5050: false,cite: false,call: false }); 
+        setCurrentParticipant({ 
+            name: participants[participantCounter], 
+            answered: 0, 
+            guess: 0,
+            fail: 0,
+            skip: 0 
+        });
+        setCurrentQuestionProceed(false);
+        setCurrentQuestion(questions[0]);
+    }
+
+    const hasRounds = roundCounter < roundsQuantity;
+
+    const getNextRound = () => {
+        saveCurrentParticipant(currentParticipant);
+        roundCounter = roundCounter + 1;
+        participantRound = 1;
+        participantCounter = 0; 
+        questionCounter = 1;
+        setCurrentSecondAnswer(secondAnswer);
+        setAnswerSelected('');
+        setComodin({ _5050: false, cite: false, call: false });                                     
+        setCurrentParticipant({ 
+            name: participants[participantCounter], 
+            answered: 0, 
+            guess: 0,
+            fail: 0,
+            skip: 0 
+        });
+        setCurrentQuestionProceed(false);
+        setCurrentQuestion(questions[0]);
+    }
+
+    const finalizeGame = () => {
+        saveCurrentParticipant(currentParticipant);
+        setGame({
+            ...game,
+            end: true
+        });
+        alert('Fin del juego');
+    }
+
+    const nextRound = () => {
+        if ( hasRounds ) {
+            getNextRound();
+        } else {
+            finalizeGame();
+        }
+    }
+
+    const nextParticipant = () => {
+        if ( hasParticipants ) {
+            getNextParticipant();
+        } else {
+           nextRound();
+        }
+    }
+
     const onNextQuestion = () => {
-        if ( questions.length > 0 ) {
-            
-            // Siguiente pregunta y actualiza la lista de preguntas
-            if ( questionCounter < questionsQuantity ) {                  
-                questionCounter = questionCounter + 1;
-                setCurrentSecondAnswer(secondAnswer);
-                setAnswerSelected('');
-                setCurrentQuestionProceed(false);
-                setCurrentQuestion(questions[0]);
-                
+        if ( hasQuestions ) {
+            if ( isLastQuestion ) {                  
+                getNextQuestion();
             } else {
-                // Siguiente Participante de la ronda
-                if ( participantRound < participants.length ) {
-                    saveCurrentParticipant(currentParticipant);
-                    // Resetea los contadores 
-                    participantRound = participantRound + 1;
-                    participantCounter = participantCounter + 1;
-                    questionCounter = 1;
-                    setCurrentSecondAnswer(secondAnswer);
-                    setAnswerSelected('');
-                    setComodin({ _5050: false,cite: false,call: false }); 
-                    setCurrentParticipant({ 
-                        name: participants[participantCounter], 
-                        answered: 0, 
-                        guess: 0,
-                        fail: 0,
-                        skip: 0 
-                    });
-                    setCurrentQuestionProceed(false);
-                    setCurrentQuestion(questions[0]);
-                } else {
-                    // Siguiente ronda
-                    if ( roundCounter < roundsQuantity ) {
-                        saveCurrentParticipant(currentParticipant);
-                        roundCounter = roundCounter + 1;
-                        participantRound = 1;
-                        participantCounter = 0; 
-                        questionCounter = 1;
-                        setCurrentSecondAnswer(secondAnswer);
-                        setAnswerSelected('');
-                        setComodin({ _5050: false, cite: false, call: false });                                     
-                        setCurrentParticipant({ 
-                            name: participants[participantCounter], 
-                            answered: 0, 
-                            guess: 0,
-                            fail: 0,
-                            skip: 0 
-                        });
-                        setCurrentQuestionProceed(false);
-                        setCurrentQuestion(questions[0]);
-                    } else {
-                        // Finalizar el juego
-                        saveCurrentParticipant(currentParticipant);
-                        setGame({
-                            ...game,
-                            end: true
-                        });
-                        alert('Fin del juego');
-                    }
-                   
-                }
-                
+                nextParticipant();
             }
         }
     }

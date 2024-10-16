@@ -84,11 +84,11 @@ export const GameResult = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Question</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Correct Answer</TableCell>
-              <TableCell>Bible Citation</TableCell>
-              <TableCell>Round</TableCell>
+              <TableCell>#</TableCell>
+              <TableCell>Pregunta</TableCell>
+              <TableCell>Respuesta correcta</TableCell>
+              <TableCell>Cita biblica</TableCell>
+              <TableCell>Ronda</TableCell>
               {participants.map((participant) => (
                 <TableCell key={participant}>{participant.name}</TableCell>
               ))}
