@@ -181,6 +181,8 @@ export const Game = ({ game, setGame }) => {
                         participants={ participants }
                         roundsQuantity={ roundsQuantity }
                         roundCounter={ roundCounter }
+                        questionCounter={ questionCounter }
+                        questionsQuantity={questionsQuantity}
                     />
                      
                 </Grid2>

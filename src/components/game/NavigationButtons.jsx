@@ -1,6 +1,8 @@
 import { Grid2, Box, Button } from '@mui/material';
 
-export const NavigationButtons = ({ onNextQuestion, answerSelected, participants, roundsQuantity, roundCounter }) => {
+export const NavigationButtons = ({ onNextQuestion, answerSelected, participants, roundsQuantity, roundCounter,
+    questionCounter, questionsQuantity
+ }) => {
 
   return (
     <Grid2 container size={12} sx={{ mt: 4, mb: 2 }}>
@@ -12,7 +14,7 @@ export const NavigationButtons = ({ onNextQuestion, answerSelected, participants
                 onClick={ onNextQuestion }
                 disabled={ !answerSelected }
             >
-            Siguiente
+            {questionCounter === questionsQuantity ? 'Finalizar' : 'Siguiente'}
           </Button>
           <Button variant="contained" sx={{ mr: 1 }}>
             Pasar pregunta
