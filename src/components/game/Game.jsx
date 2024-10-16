@@ -6,6 +6,8 @@ import { ParticipantPanel } from './ParticipantPanel';
 
 import { repositoryQuestions } from '../../data/repositoryQuestions';
 import { saveCurrentParticipant } from '../../helpers/helpers';
+import { MessageAlert } from './MessageAlert';
+import { Description } from '@mui/icons-material';
 
 
 let roundCounter = 1
@@ -34,6 +36,7 @@ export const Game = ({ game, setGame }) => {
     const [ isAnswerCorrect, setIsAnswerCorrect ] = useState(false);
     const [ answerSelected, setAnswerSelected ] = useState('');
     const [ currentQuestionProceed, setCurrentQuestionProceed ] = useState(false);
+    const [ openMessage, setOpenMessage ] = useState(false);
 
     useEffect(() => {
         setCurrentParticipant({
@@ -127,7 +130,9 @@ export const Game = ({ game, setGame }) => {
 
     const nextParticipant = () => {
         if ( hasParticipants ) {
+            setOpenMessage(true);
             getNextParticipant();
+            
         } else {
            nextRound();
         }
@@ -143,8 +148,19 @@ export const Game = ({ game, setGame }) => {
         }
     }
 
+    const myMessageAlert = {
+        title: 'Preguntas completadas',
+        description: `La ronda ha finalizado para el jugador ${currentParticipant.name}. ¿Desea pasar a la siguiente ronda?` 
+    }
+
   return (
     <Container maxWidth="lg" sx={{ mt: 5 }}>
+        <MessageAlert
+            message={myMessageAlert}
+            openMessage={openMessage} 
+            setOpenMessage={setOpenMessage}
+            currentParticipant={currentParticipant}
+        />
         <Paper sx={{ p: 2 }}>
             {/*  */}
             <Typography variant='h5' component="h2" sx={{ textAlign: 'center', mb: 3 }}>Juego en curso</Typography>
