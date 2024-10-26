@@ -1,13 +1,11 @@
 import { Grid2, Box, Container, Typography, Button } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { toggleForm } from '../../store/slicers/gameSlicer';
 
-export const Home = ({ game, setGame }) => {
+export const Home = () => {
 
-  const onStart = () => {
-    setGame({
-      ...game,
-      formStarted: true
-    });
-  }
+  const dispatch = useDispatch();
+  
   return (
     <Container maxWidth="xl">
       <Grid2 container spacing={2}>
@@ -28,7 +26,7 @@ export const Home = ({ game, setGame }) => {
           </Box>
           <Box sx={{ mt: 5 }}>
             <Button variant="contained"
-              onClick={ onStart }
+              onClick={ () => dispatch( toggleForm() ) }
             >Iniciar</Button>
           </Box>
         </Grid2>

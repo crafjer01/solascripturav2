@@ -1,8 +1,15 @@
 import { Grid2, Box, Button } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { newQuestion } from '../../store/slicers/gameSlicer';
 
-export const NavigationButtons = ({ onNextQuestion, answerSelected, participants, roundsQuantity, roundCounter,
-    questionCounter, questionsQuantity
- }) => {
+export const NavigationButtons = () => {
+  const { currentQuestion, questionAmountByParticipantIndex, questionAmountByParticipant,
+        participants, rounds, currentRound } = useSelector(state => state.game);
+  const dispatch =  useDispatch();
+
+  const isLastQuestion = questionAmountByParticipantIndex === questionAmountByParticipant;
+  const canRetireParticipants = participants.length > 2;
+  const canCancelRound = rounds > currentRound;
 
   return (
     <Grid2 container size={12} sx={{ mt: 4, mb: 2 }}>
@@ -11,26 +18,25 @@ export const NavigationButtons = ({ onNextQuestion, answerSelected, participants
           <Button 
                 variant="contained" 
                 sx={{ mr: 1 }} 
-                onClick={ onNextQuestion }
-                disabled={ !answerSelected }
+                onClick={ () => dispatch( newQuestion() ) }
+                disabled={ !currentQuestion?.is_proceed }
             >
-            {questionCounter === questionsQuantity ? 'Finalizar' : 'Siguiente'}
+            {(isLastQuestion) ? 'Finalizar' : 'Siguiente'}
           </Button>
-          <Button variant="contained" sx={{ mr: 1 }}>
-            Pasar pregunta
+          <Button variant="contained" sx={{ mr: 1 }}
+            disabled={ isLastQuestion }
+          >Pasar pregunta
           </Button>
           <Button
             variant="contained"
             sx={{ mr: 1 }}
-            disabled={participants.length === 2}
-          >
-            Retirar Participante
+            disabled={ !canRetireParticipants }
+          > Retirar Participante
           </Button>
           <Button
             variant="contained"
-            disabled={roundsQuantity === roundCounter}
-          >
-            Cancelar Ronda
+            disabled={ !canCancelRound }
+          >Cancelar Ronda
           </Button>
         </Box>
       </Grid2>

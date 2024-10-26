@@ -1,4 +1,6 @@
-import { FormControl, Box, InputLabel, Select, MenuItem, OutlinedInput, Chip  } from '@mui/material';
+import { FormControl, Box, InputLabel, Select, MenuItem, Chip  } from '@mui/material';
+
+
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -11,19 +13,12 @@ const MenuProps = {
   },
 };
 
-
-function getStyles(name, personName, theme) {
-    return {
-      fontWeight: personName.includes(name)
-        ? theme.typography.fontWeightMedium
-        : theme.typography.fontWeightRegular,
-    };
-}
-
-export const SelectBook = ({ books, name, onBookSelecChange, booksSelected, selectDisabled }) => {
+export const SelectBook = ({ books, name, onBookSelecChange, selectDisabled, booksSelected }) => {
   return (
     <FormControl variant="standard" fullWidth>
-      <InputLabel id={`${name}-book-label`}>{ (!selectDisabled) ? `Seleccione el ${name} testamento` : '' }</InputLabel>
+      <InputLabel id={`${name}-book-label`}>
+        { (!selectDisabled) ? `Seleccione el ${name} testamento` : '' }
+      </InputLabel>
       <Select
         disabled={selectDisabled}
         labelId={`${name}-book--label`} 
@@ -31,7 +26,6 @@ export const SelectBook = ({ books, name, onBookSelecChange, booksSelected, sele
         multiple
         value={booksSelected}
         onChange={ onBookSelecChange }
-        // input={<OutlinedInput id={`${name}-book`} label="Chip" />}
         renderValue={(selected) => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
               {selected.map((value) => (
