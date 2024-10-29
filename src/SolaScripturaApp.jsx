@@ -11,31 +11,37 @@ import { useSelector } from 'react-redux';
 
 
 export const SolaScripturaApp = () => {
+   // Redux state
   const { isGameStarted, isGameEnd, isFormOpen } = useSelector(state => state.game)
-  const [game, setGame] = useState({
-    started: false,
-    end: false,
-    secondAnswer: 30,
-    questionsQuantity: 5,
-    roundsQuantity: null,
-    participants: []
-  });
-  const [ preloading, setPreloading ] = useState(false);
+  const [ preloading, setPreloading ] = useState(true);
 
+   // Handle initial loading
   useEffect(() => {
-    setTimeout(() => {
+    const preloadTimer = setTimeout(() => {
       setPreloading(false);
     }, 9500);
+
+    // Cleanup timeout to prevent memory leaks
+    return () => clearTimeout(preloadTimer);
   }, []);
+
+   // Render different components based on game state
+   const renderGameState = () => {
+    if (preloading) return <Preloading />;
+    if (isFormOpen && !isGameStarted) return <Form />;
+    if (isGameStarted && !isGameEnd) return <Game />;
+    if (isGameEnd) return <FinalPanel />;
+    return <Home />;
+  };
 
   return (
     <AppTheme>
-        { preloading && <Preloading /> }
-        <Navbar />
-        { (!isFormOpen && !isGameStarted) && <Home /> } 
-        { (isFormOpen && !isGameStarted) && <Form /> }
-        { (isGameStarted && !isGameEnd) && <Game /> }
-        { (isGameEnd) && <FinalPanel /> }
+        <div className="min-h-screen bg-gray-100">
+          <Navbar />
+          <main className="container mx-auto px-4 py-8">
+          { renderGameState() }
+          </main>
+        </div>
     </AppTheme>
   )
 }

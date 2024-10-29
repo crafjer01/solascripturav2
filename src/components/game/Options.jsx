@@ -1,9 +1,9 @@
 import { FormControlLabel, Radio } from '@mui/material'
-import { processQuestion, setAnsweredCorrect, setAnswerText, setQuestionParticipant, setQuestionRound, setScoreCurrentParticipant } from '../../store/slicers/gameSlicer';
+import { processQuestion, setAnsweredCorrect, setAnswerText, setQuestionParticipant, setQuestionRound, setQuestionsAvailable, setScoreCurrentParticipant } from '../../store/slicers/gameSlicer';
 import { useDispatch, useSelector } from 'react-redux';
 
 export const Options = ({ answer }) => {
-    const { currentQuestion =  {}, currentParticipant, currentRound } = useSelector(state => state.game);
+    const { currentQuestion =  {}, questions = [],  currentParticipant, currentRound } = useSelector(state => state.game);
     const dispatch = useDispatch();
 
     const selectAnswer = (theAnswer) => {
@@ -18,7 +18,18 @@ export const Options = ({ answer }) => {
                 fail: currentParticipant.fail + newFail,
             }
             dispatch( setScoreCurrentParticipant(participant) );
-
+            const questionsUpdated = questions.map(question => 
+              question.id === currentQuestion.id
+                ? {
+                    ...question,
+                    is_proceed: true,
+                    name: participant.name,
+                    answered_correct: theAnswer.is_correct,
+                    round_number: currentRound
+                  }
+                : question
+            );
+            dispatch(setQuestionsAvailable(questionsUpdated));
             dispatch(processQuestion() );
             dispatch( setQuestionParticipant(currentParticipant.name));
             dispatch(setQuestionRound(currentRound));

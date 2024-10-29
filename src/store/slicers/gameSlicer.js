@@ -12,6 +12,7 @@ const initialState = {
   currentParticipantIndex: 0,
   currentParticipant: {},
   participantRoundsIndex: 0,
+  participantsScore: [],
   questions: [],
   currentQuestionIndex: 0,
   currentQuestion: {},
@@ -35,7 +36,7 @@ export const gameSlicer = createSlice({
   initialState,
   reducers: {
     setQuestionsAvailable: (state, action) => {
-      state.questions = action.payload.questions;
+      state.questions = action.payload;
     },
     setCurrentAnswers: (state, action) => {
       state.currentAnswers = action.payload;
@@ -109,10 +110,13 @@ export const gameSlicer = createSlice({
 
           if ( state.currentRound >= state.rounds ) {
             alert('All rounds have been played. Game over!');
+            state.participantsScore = [...state.participantsScore, state.currentParticipant];
+            state.isGameEnd = true;
           } 
           // Next Round
           else {
             alert('Next Rounds!');
+            state.participantsScore = [...state.participantsScore, state.currentParticipant];
             state.currentRound++;
             state.currentQuestionIndex++;
             state.questionAmountByParticipantIndex = 1;
@@ -131,6 +135,7 @@ export const gameSlicer = createSlice({
         // Next participant if all questions have not been answered for a participant
         else {
           alert('Next participant!');
+          state.participantsScore = [...state.participantsScore, state.currentParticipant];
           state.currentQuestionIndex++;
           state.currentParticipantIndex++;
           state.participantRoundsIndex++;
@@ -151,7 +156,7 @@ export const gameSlicer = createSlice({
       else {
         state.currentQuestionIndex++;
         state.questionAmountByParticipantIndex = state.questionAmountByParticipantIndex + 1;
-
+        console.log('state.questions: ', state.questions);
         state.currentQuestion = state.questions[state.currentQuestionIndex];
        
         state.timeLeft = 60;
